@@ -52,6 +52,8 @@ RUN echo 'install.packages("caret")' > /tmp/packages.R \
 RUN echo 'install.packages("pROC")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
 
+RUN echo 'install.packages("mlr")' > /tmp/packages.R \
+    && Rscript /tmp/packages.R
 
 # h2o ports
 EXPOSE 54321
