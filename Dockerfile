@@ -31,6 +31,10 @@ RUN \
   DEBIAN_FRONTEND=noninteractive apt-get install -y  --allow-unauthenticated oracle-java8-installer && \
   apt-get clean 
 
+# permissions
+
+RUN chown -R rstudio:rstudio /home/rstudio/*
+
 # Fetch h2o R latest_stable
 
 # install packages
