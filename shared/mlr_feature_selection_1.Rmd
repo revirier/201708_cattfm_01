@@ -118,13 +118,6 @@ rdesc = makeResampleDesc("CV", iters = 5)
 ```
 
 
-```{r}
-ctrl = makeFeatSelControlSequential(same.resampling.instance = TRUE,
-  impute.val = NULL, method='sfbs', maxit = 2, max.features = NA_integer_
-  , alpha = 0.001, beta=-0.001,tune.threshold = TRUE,tune.threshold.args = list(measure=list(auc)))
-```
-
-
 #feature selection
 ```{r}
 sfeats = selectFeatures(learner = lrn, task = cltask_1, resampling = rdesc, control = ctrl,

@@ -59,6 +59,10 @@ RUN echo 'install.packages("pROC")' > /tmp/packages.R \
 RUN echo 'install.packages("mlr")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
 
+# Install packages
+RUN apt-get update && \
+DEBIAN_FRONTEND=noninteractive apt-get -qq install screen
+
 # h2o ports
 EXPOSE 54321
 EXPOSE 54322
