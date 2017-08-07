@@ -1,6 +1,8 @@
 ---
 # load the data from SQL database and save a dataframe
 
+# dataframe ds_icu_pm_2  
+# datafile  ds_icu_raw_2
 ---
   
 #libraries
@@ -18,15 +20,19 @@ con <- dbConnect(drv, dbname = "mimicsel",
                  user = "mimicsel", password = "mimicsel")
 
 
-# check for the cartable
-dbExistsTable(con, "ds_icu_stays_1")
+# check for the table
+# ds_icu_stays_2
+# comorbidities from view
+# 20170807
+
+dbExistsTable(con, "ds_icu_stays_2")
 # TRUE
 
 
 #dataframe from table
 
 
-ds_icu_pm_1<-dbGetQuery(con,"select 
+ds_icu_pm_2<-dbGetQuery(con,"select 
                         PAT_GENDER,PAT_EXPIRE_HOSP,ADT_HOS_AGE,ADT_HSTAYS,ADT_READMIT,ICU_DBSOURCE,ICU_LOS,ICU_TYPE_FSERVICE,ICU_DEAD_BEFORE_28,ICU_HAS_PRESC_INSULIN,
                         ICU_HAS_ADMIV_INSULIN,ICU_HAS_ADMIT_INSULIN,ICU_STAY_MORE72,ICD9P_M,ICD9D_M,ICD9D_M_CHAPTER,DIAG_M_HAS_DIABET,DIAG_S_HAS_DIABET,COM_CONGEST_HEA_FAILURE ,COM_CARDIAC_ARRHYTHMIAS ,
                         COM_VALVULA_DISEASE ,COM_PULMONA_CIR_DISORDERS ,COM_PERIPHE_VAS_DISORDERS ,COM_HYPERTENSION ,COM_PARALYSIS ,COM_OTHER_NEUR_DISORDERS ,COM_CHRONIC_PUL_DISEASE ,
@@ -54,5 +60,5 @@ ds_icu_pm_1<-dbGetQuery(con,"select
                         ds_icu_stays_1")
 
 
-save(file="~/shared/ds_icu_raw_1",ds_icu_pm_1)
+save(file="~/shared/ds_icu_raw_2",ds_icu_pm_2)
 
