@@ -25,17 +25,17 @@ ds_icu_pm_2$icu_dead_before_28 <- NULL
 
 #small dataset to begin tests
 
-small_sample<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.20,list = FALSE)
+small_sample<-createDataPartition(y=ds_icu_pm_2$y,p=.20,list = FALSE)
 ds_small_sample<-ds_icu_pm_2[small_sample,]
 
 #training and test datasets
 
-small_train<-createDataPartition(y=ds_small_sample$icu_dead_before_28,p=.60,list = FALSE)
+small_train<-createDataPartition(y=ds_small_sample$y,p=.60,list = FALSE)
 ds_small_train<-ds_small_sample[small_train,]
 ds_small_test<-ds_small_sample[-small_train,]
 
 
-full_train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+full_train<-createDataPartition(y=ds_icu_pm_2$y,p=.60,list = FALSE)
 ds_train<-ds_icu_pm_2[full_train,]
 ds_test<-ds_icu_pm_2[-full_train,]
 
