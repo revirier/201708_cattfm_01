@@ -64,8 +64,8 @@ RUN apt-get update && \
 DEBIAN_FRONTEND=noninteractive apt-get -qq install screen vim
 
 # shutdown link
-RUN ln -f -s -- ../bin/systemctl /sbin/reboot \ &&
-    ln -f -s -- ../bin/systemctl /sbin/shutdown
+RUN ln -f -s -- ../bin/systemctl /sbin/reboot \ 
+    && ln -f -s -- ../bin/systemctl /sbin/shutdown
 
 RUN echo 'install.packages("doMC")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
