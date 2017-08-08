@@ -59,7 +59,7 @@ ctrl = makeFeatSelControlSequential(same.resampling.instance = TRUE,
 #glm learner
 #default values
 
-lrn<-makeLearner("classif.h2o.glm",predict.type = "prob")
+lrn<-makeLearner("classif.glm",predict.type = "prob")
 
 
 # 10 cv resampling
