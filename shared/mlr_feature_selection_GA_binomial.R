@@ -68,8 +68,8 @@ cltask_2 = makeClassifTask(id = "c2", data = ds_icu_pm_2, target = "y",positive=
 # ctrl
 
 ctrl = makeFeatSelControlGA(same.resampling.instance = TRUE, impute.val = NULL,
-                            maxit = 100, max.features = NA_integer_, comma = FALSE,
-                            mu = 10L, lambda=2, crossover.rate = 0.5, mutation.rate = 0.05,
+                            maxit = 500, max.features = NA_integer_, comma = FALSE,
+                            mu = 50L, lambda=5, crossover.rate = 0.5, mutation.rate = 0.05,
                             tune.threshold = TRUE,tune.threshold.args = list(measure=list(auc)))
 
 
