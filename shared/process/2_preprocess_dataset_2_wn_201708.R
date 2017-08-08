@@ -24,20 +24,19 @@ load(file="~/shared/ds_icu_raw_2")
 
 ds_icu_pm_2[,sapply(ds_icu_pm_2,is.logical)]<-ds_icu_pm_2[,sapply(ds_icu_pm_2,is.logical)]+0
 
-
-
 #PAT_GENDER to 0,1 FEMALE->1, MALE->0
 
 ds_icu_pm_2$pat_gender=ds_icu_pm_2$pat_gender=="F"
 ds_icu_pm_2$pat_gender=ds_icu_pm_2$pat_gender+0
 
-
 #delete column
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("pat_expire_hosp"))]
 
-
 # asign to decades
 ds_icu_pm_2$adt_hos_age<-cut(ds_icu_pm_2$adt_hos_age,breaks=seq(0,100,10),labels=seq(0,9))
+
+#factorize
+ds_icu_pm_2$adt_hos_age<-as.factor(ds_icu_pm_2$adt_hos_age)
 
 #delete column
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("adt_readmit"))]
@@ -71,7 +70,6 @@ ds_icu_pm_2$icd9d_m<-as.factor(as.character(ds_icu_pm_2$icd9d_m))
 #combine columns OR
 ds_icu_pm_2$diag_has_diabet<-(ds_icu_pm_2$diag_m_has_diabet | ds_icu_pm_2$diag_s_has_diabet) 
 ds_icu_pm_2$diag_has_diabet<-ds_icu_pm_2$diag_has_diabet+0
-
 
 #delete column
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("diag_s_has_diabet","diag_m_has_diabet"))]
@@ -154,7 +152,6 @@ ds_icu_pm_2$in_range_clinic_percent_72h[ds_icu_pm_2$in_range_clinic_percent_72h>
 ds_icu_pm_2$in_range_protocol_percent_72h[ds_icu_pm_2$in_range_protocol_percent_72h<0]<-NA
 ds_icu_pm_2$in_range_protocol_percent_72h[ds_icu_pm_2$in_range_protocol_percent_72h>100]<-NA
 
-
 #FINAL FORMAT DATASET
 #only variables obtained for <72H
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% names(ds_icu_pm_2[grep("_icu",names(ds_icu_pm_2))]))]
@@ -162,17 +159,20 @@ ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% names(ds_icu_pm_2[grep(
 #delete icu_los and adt_hstays
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icu_los","adt_hstays"))]
 
-#db_sources
+#delete db_sources
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icu_dbsource"))]
 
 #problems with factor
-ds_icu_pm_2$adt_hos_age<-as.numeric(ds_icu_pm_2$adt_hos_age)
+#ds_icu_pm_2$adt_hos_age<-as.numeric(ds_icu_pm_2$adt_hos_age)
 
 #delete only score_sapii data
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_sapsii"))]
 
 #auxiliar variable
 ds_icu_pm_2$score_sofa_more4<-as.numeric(ds_icu_pm_2$score_sofa>=4)
+
+#factorize
+ds_icu_pm_2$score_sofa<-as.factor(ds_icu_pm_2$score_sofa)
 
 #group icd9_m_chapter
 dicd9<-(ds_icu_pm_2 %>% group_by(icd9d_m_chapter) %>% summarise(n=n()) %>% arrange(n))
@@ -189,7 +189,6 @@ ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icd9d_m"))]
 preproc_ds_range<-preProcess(ds_icu_pm_2,method = c("medianImpute"))
 ds_icu_pm_2<-predict(preproc_ds_range,ds_icu_pm_2)
 
-
 #factorize outcome
 ds_icu_pm_2$icu_dead_before_28<-as.factor(ds_icu_pm_2$icu_dead_before_28)
 levels(ds_icu_pm_2$icu_dead_before_28)<-make.names(levels(ds_icu_pm_2$icu_dead_before_28))
@@ -203,7 +202,6 @@ for (i in 1:length(bincols)) {
     ds_icu_pm_2[[i]]<-as.factor(ds_icu_pm_2[[i]])
   }
 }
-
 
 save(file="~/shared/ds_icu_pm_2",ds_icu_pm_2)
 

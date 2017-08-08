@@ -57,7 +57,7 @@ ds_icu_pm_2<-dbGetQuery(con,"select
                         GLUCOSE_VARIABILITY_72H,NUT_TPN_IN_24H,NUT_NPO_IN_24H,NUT_PPN_IN_24H,
                         NUT_TFE_IN_24H,NUT_TPN_IN_48H,NUT_NPO_IN_48H,NUT_PPN_IN_48H,NUT_TFE_IN_48H,NUT_TPN_IN_72H,NUT_NPO_IN_72H,NUT_PPN_IN_72H,NUT_TFE_IN_72H
                         from 
-                        ds_icu_stays_1")
+                        ds_icu_stays_2")
 
 
 save(file="~/shared/ds_icu_raw_2",ds_icu_pm_2)
