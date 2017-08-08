@@ -14,6 +14,14 @@ h2o.init(nthreads=-1, max_mem_size = "7G")
 
 load(file = "~/shared/ds_icu_pm_2")
 
+#variables
+# rename icu_dead to y
+
+y<-"y"
+
+ds_icu_pm_2$y<-ds_icu_pm_2$icu_dead_before_28
+ds_icu_pm_2$icu_dead_before_28 <- NULL
+
 
 #small dataset to begin tests
 
@@ -31,18 +39,15 @@ full_train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FA
 ds_train<-ds_icu_pm_2[full_train,]
 ds_test<-ds_icu_pm_2[-full_train,]
 
-#variables
-
-y<-"icu_dead_before_28"
 
 
 #tasks
 
 #small dataset
-cltask_1 = makeClassifTask(id = "c1", data = ds_small_sample, target="icu_dead_before_28",positive="X1")
+cltask_1 = makeClassifTask(id = "c1", data = ds_small_sample, target="y",positive="X1")
 
 #full dataset
-cltask_2 = makeClassifTask(id = "c2", data = ds_icu_pm_2, target = "icu_dead_before_28",positive="X1")
+cltask_2 = makeClassifTask(id = "c2", data = ds_icu_pm_2, target = "y",positive="X1")
 
 
 
