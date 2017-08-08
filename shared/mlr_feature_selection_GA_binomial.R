@@ -77,7 +77,7 @@ ctrl = makeFeatSelControlGA(same.resampling.instance = TRUE, impute.val = NULL,
 #glm learner
 #default values
 
-lrn<-makeLearner("classif.glm",predict.type = "prob")
+lrn<-makeLearner("classif.binomial",predict.type = "prob")
 
 
 # 10 cv resampling
