@@ -51,8 +51,8 @@ cltask_2 = makeClassifTask(id = "c2", data = ds_icu_pm_2, target = "icu_dead_bef
 # ctrl
 
 ctrl = makeFeatSelControlSequential(same.resampling.instance = TRUE,
-                                    impute.val = NULL, method='sffs', maxit = 10, max.features = NA_integer_
-                                    , alpha = 0.02, beta=-0.01,tune.threshold = TRUE,tune.threshold.args = list(measure=list(auc)))
+                                    impute.val = NULL, method='sfbs', maxit = 10, max.features = NA_integer_
+                                    , alpha = 0.001, beta=-0.001,tune.threshold = TRUE,tune.threshold.args = list(measure=list(auc)))
 
 
 

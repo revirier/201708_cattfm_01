@@ -61,7 +61,7 @@ RUN echo 'install.packages("mlr")' > /tmp/packages.R \
 
 # Install packages
 RUN apt-get update && \
-DEBIAN_FRONTEND=noninteractive apt-get -qq install screen
+DEBIAN_FRONTEND=noninteractive apt-get -qq install screen vim
 
 # h2o ports
 EXPOSE 54321
