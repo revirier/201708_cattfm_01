@@ -33,7 +33,7 @@ RUN \
 
 # permissions
 
-RUN chown -R rstudio:rstudio /home/rstudio/*
+RUN chown -R rstudio:rstudio /home/rstudio
 
 # Fetch h2o R latest_stable
 
