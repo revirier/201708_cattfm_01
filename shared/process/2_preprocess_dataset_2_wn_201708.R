@@ -18,7 +18,6 @@ require("dplyr")
 load(file="~/shared/datasets/ds_icu_raw_2")
 
 
-# 20445 of 168 variables
 
 #first we converted the logical values to 1=TRUE / 0=FALSE
 

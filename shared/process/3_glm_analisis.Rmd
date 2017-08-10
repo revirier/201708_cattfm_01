@@ -1,0 +1,145 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+#start h2o
+
+h2o.init(nthreads=-1, max_mem_size = "7G")
+#h2o.removeAll()
+#h2o.shutdown(prompt = FALSE)
+
+# LOAD DATASET
+load("~/shared/datasets/ds_icu_pm_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+#dataset total
+```{r}
+
+lmdl<-list()
+
+train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+d_train<-ds_icu_pm_2[train,]
+d_test<-ds_icu_pm_2[-train,]
+  
+
+
+#glm full 
+time_train<-system.time(glm_iter <- h2o.glm(y = y,
+                                              training_frame = as.h2o(d_train),
+                                              validation_frame = as.h2o(d_test),
+                                              family = "binomial",
+                                              link="logit",
+                                              balance_classes = TRUE,
+                                              lambda = 0,
+                                              standardize=TRUE,
+                                              remove_collinear_columns=TRUE,
+                                              compute_p_values=TRUE,
+                                              nfolds = 10,
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1)
+                                              )
+lmdl<-glm_iter
+
+save(lmdl,file="~/shared/results/lmdl_201808_01_total")
+
+```
+
+```{r}
+summary(lmdl)
+```
+
+
+```{r}
+#Time
+for (m in (names(lmdl[grep("_time",names(lmdl))]))){
+  print(paste(sep=",",m,eval(parse(text=paste0("lmdl$",m)))))
+}
+
+```
+
+```{r}
+
+#AUC
+for (m in (names(lmdl[-grep("_time",names(lmdl))]))){
+  print(paste(sep=",",m,"train",eval(parse(text=paste0("lmdl$",m,"@model$training_metrics@metrics$AUC"))),
+              "validation",eval(parse(text=paste0("lmdl$",m,"@model$validation_metrics@metrics$AUC"))),
+              "cv",eval(parse(text=paste0("lmdl$",m,"@model$cross_validation_metrics@metrics$AUC")))))
+}
+
+```
+```
+
+
+```{r}
+glm_iter
+```
+
+#coeficients
+```{r}
+h2o.coef(glm_iter)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(glm_iter)
+```
+
+#coeficients table
+```{r}
+View(glm_iter@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(glm_iter)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = glm_iter@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = glm_iter@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = glm_iter@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = glm_iter@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='red')
+legend("bottomright",c("Train", "Validation"),col=c("black","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(glm_iter,valid=FALSE) # on train
+h2o.auc(glm_iter,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+glm_iter@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+
+#violins plots
+```{r}
+
+```
+

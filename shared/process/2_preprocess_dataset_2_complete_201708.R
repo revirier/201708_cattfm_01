@@ -31,6 +31,11 @@ ds_icu_pm_2[,sapply(ds_icu_pm_2,is.logical)]<-ds_icu_pm_2[,sapply(ds_icu_pm_2,is
 ds_icu_pm_2$pat_gender=ds_icu_pm_2$pat_gender=="F"
 ds_icu_pm_2$pat_gender=ds_icu_pm_2$pat_gender+0
 
+#delete column
+ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("pat_expire_hosp"))]
+
+#delete icu_los and adt_hstays
+ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icu_los","adt_hstays"))]
 
 # asign to decades
 ds_icu_pm_2$adt_hos_age<-cut(ds_icu_pm_2$adt_hos_age,breaks=seq(0,100,10),labels=seq(0,9))
