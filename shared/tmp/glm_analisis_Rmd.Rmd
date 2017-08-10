@@ -1,0 +1,216 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+#start h2o
+
+h2o.init(nthreads=-1, max_mem_size = "7G")
+#h2o.removeAll()
+#h2o.shutdown(prompt = FALSE)
+
+# LOAD DATASET
+load("~/shared/ds_icu_pm_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+#groups
+```{r}
+
+#---------------------------------------------------------------------
+#more/less than 3 icu stays
+ds_icu_stay_more72<-filter(ds_icu_pm_2,icu_stay_more72==1)
+ds_icu_stay_less72<-filter(ds_icu_pm_2,icu_stay_more72==0)
+
+
+
+#more/less than 4 sofa score
+ds_icu_sofa_score_more4<-filter(ds_icu_pm_2,score_sofa_more4==1)
+ds_icu_sofa_score_less4<-filter(ds_icu_pm_2,score_sofa_more4==0)
+
+
+#yes/no diabetics
+ds_icu_diabetes_yes<-filter(ds_icu_pm_2,diag_has_diabet==1)
+ds_icu_diabetes_no<-filter(ds_icu_pm_2,diag_has_diabet==0)
+
+
+#yes/no insuline IV
+ds_icu_insulineiv_yes<-filter(ds_icu_pm_2,icu_has_admiv_insulin==1)
+ds_icu_insulineiv_no<-filter(ds_icu_pm_2,icu_has_admiv_insulin==0)
+
+
+#yes/no sepsis in
+ds_icu_sepsis_yes<-filter(ds_icu_pm_2,med_has_sepsis==1)
+ds_icu_sepsis_no<-filter(ds_icu_pm_2,med_has_sepsis==0)
+
+#------------------------------------------------------
+list_groups=c("ds_icu_pm_2","ds_icu_stay_more72","ds_icu_stay_less72","ds_icu_sofa_score_more4",
+              "ds_icu_sofa_score_less4",  "ds_icu_diabetes_yes","ds_icu_diabetes_no","ds_icu_insulineiv_yes",
+              "ds_icu_insulineiv_no","ds_icu_sepsis_yes","ds_icu_sepsis_no")
+
+
+#loop
+```
+
+```{r}
+
+lmdl<-list()
+
+for (d in list_groups){
+  
+  print("#######################################################################################")
+  print(d)
+  print("#######################################################################################")
+  
+  ds_group<-eval(parse(text=d))
+  
+  train<-createDataPartition(y=ds_group$icu_dead_before_28,p=.60,list = FALSE)
+  d_train<-ds_group[train,]
+  d_test<-ds_group[-train,]
+  
+
+  #glm full 
+  time_train<-system.time(glm_iter <- h2o.glm(y = y,
+                                              training_frame = as.h2o(d_train),
+                                              validation_frame = as.h2o(d_test),
+                                              family = "binomial",
+                                              link="logit",
+                                              balance_classes = TRUE,
+                                              lambda = 0,
+                                              standardize=TRUE,
+                                              remove_collinear_columns=TRUE,
+                                              compute_p_values=TRUE,
+                                              nfolds = 10,
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1)
+                                              )
+  
+  lmdl[[paste0("glm_",d)]]<-glm_iter
+  lmdl[[paste0("glm_",d,"_time")]]<-time_train
+
+  
+#gbm Gradient Boosting Machine
+  
+  time_train<-system.time(gbm_iter <- h2o.gbm(y = y,
+                                              training_frame = as.h2o(d_train),
+                                              validation_frame = as.h2o(d_test),
+                                              distribution = "bernoulli",
+                                              balance_classes = TRUE,
+                                              ntrees = 1255,
+                                              max_depth = 6,
+                                              min_rows = 10,
+                                              learn_rate = 0.007709469,
+                                              nfolds = 10,
+                                              fold_assignment = "Modulo", # for stacked
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1))
+  
+  
+  
+  lmdl[[paste0("gbm_",d)]]<-gbm_iter
+  lmdl[[paste0("gbm_",d,"_time")]]<-time_train
+  
+  }
+
+save(lmdl,file="~/shared/lmdl_201808_01")
+
+```
+
+```{r}
+summary(lmdl)
+```
+
+
+```{r}
+#Time
+for (m in (names(lmdl[grep("_time",names(lmdl))]))){
+  print(paste(sep=",",m,eval(parse(text=paste0("lmdl$",m)))))
+}
+
+```
+
+```{r}
+
+#AUC
+for (m in (names(lmdl[-grep("_time",names(lmdl))]))){
+  print(paste(sep=",",m,"train",eval(parse(text=paste0("lmdl$",m,"@model$training_metrics@metrics$AUC"))),
+              "validation",eval(parse(text=paste0("lmdl$",m,"@model$validation_metrics@metrics$AUC"))),
+              "cv",eval(parse(text=paste0("lmdl$",m,"@model$cross_validation_metrics@metrics$AUC")))))
+}
+
+```
+```
+
+
+```{r}
+glm_iter
+```
+
+#coeficients
+```{r}
+h2o.coef(glm_iter)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(glm_iter)
+```
+
+#coeficients table
+```{r}
+View(glm_iter@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(glm_iter)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = glm_iter@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = glm_iter@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = glm_iter@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = glm_iter@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='red')
+legend("bottomright",c("Train", "Validation"),col=c("black","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(glm_iter,valid=FALSE) # on train
+h2o.auc(glm_iter,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+glm_iter@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+
+#violins plots
+```{r}
+
+```
+

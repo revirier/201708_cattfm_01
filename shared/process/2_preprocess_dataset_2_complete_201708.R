@@ -4,6 +4,8 @@
   
 # 20170807
 # load from dataset 2
+  
+# completa dataset
 
 ---
   
@@ -12,10 +14,10 @@
 
 require("caret")
 require("dplyr")
-require("pROC")
 
 
-load(file="~/shared/ds_icu_raw_2")
+
+load(file="~/shared/datasets/ds_icu_raw_2")
 
 
 # 20445 of 168 variables
@@ -148,6 +150,9 @@ ds_icu_pm_2<-ds_icu_pm_2 %>% mutate(icd9d_m_chapter=ifelse(icd9d_m_chapter %in% 
 ds_icu_pm_2$icd9d_m_chapter<-as.factor(ds_icu_pm_2$icd9d_m_chapter)
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icd9d_m"))]
 
+#delete column
+ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("icd9p_m"))]
+
 # 20170807
 #imputation only with caret
 preproc_ds_range<-preProcess(ds_icu_pm_2,method = c("medianImpute"))
@@ -167,6 +172,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-save(file="~/shared/ds_icu_pm_2",ds_icu_pm_2)
+save(file="~/shared/datasets/ds_icu_pm_complete_2",ds_icu_pm_2)
 
 

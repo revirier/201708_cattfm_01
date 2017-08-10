@@ -60,5 +60,5 @@ ds_icu_pm_2<-dbGetQuery(con,"select
                         ds_icu_stays_2")
 
 
-save(file="~/shared/ds_icu_raw_2",ds_icu_pm_2)
+save(file="~/shared/datasets/ds_icu_raw_2",ds_icu_pm_2)
 
