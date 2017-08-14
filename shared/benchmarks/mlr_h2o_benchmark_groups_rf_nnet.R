@@ -17,7 +17,7 @@ h2o.init(nthreads=-1, max_mem_size = "14G")
 
 # LOAD DATASET
 
-load(file = "~/shared/datasets/ds_icu_pm_2")
+load(file = "~/shared/datasets/ds_icu_pm_complete_2")
 
 
 #variables
@@ -105,8 +105,6 @@ meas = list(auc,mmce,timetrain,f1)
 
 
 bmr = benchmark(lrns, ltasks , rdesc, meas, show.info = TRUE)
-
-
 
 save(file="~/shared/results/bmr_rf_nnet",bmr)
 

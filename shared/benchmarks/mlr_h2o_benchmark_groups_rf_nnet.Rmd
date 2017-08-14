@@ -19,8 +19,13 @@ set.seed(1000)
 
 #load results
 ```{r}
-load (file="~/shared/results/bmr_bmr_rf_nnet")
+load (file="~/shared/results/bmr_rf_net")
 ```
+
+```{r}
+bmr
+```
+
 
 #boxplot
 ```{r}

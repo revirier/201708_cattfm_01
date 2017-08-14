@@ -22,6 +22,12 @@ set.seed(1000)
 load (file="~/shared/results/bmr_gbm_glm")
 ```
 
+```{r}
+bmr
+```
+
+
+
 #boxplot
 ```{r}
 plotBMRBoxplots(bmr,measure = auc)
