@@ -1,0 +1,458 @@
+---
+title: "R Notebook statistics"
+output: html_notebook
+---
+
+#use data.table
+```{r}
+require(data.table)
+```
+
+
+#load raw data and convert to data table
+```{r}
+load('~/shared/datasets/ds_icu_raw_2')
+DTRW<-data.table(ds_icu_pm_2)
+```
+
+#load data processed
+```{r}
+load('~/shared/datasets/ds_icu_pm_complete_2')
+DT<-data.table(ds_icu_pm_2)
+```
+
+```{r}
+View(DT)
+```
+
+#data frame to save results
+```{r}
+d_res<-data.frame(matrix(ncol<-9,nrow<-0))
+colnames(d_res)<-c("Feature","Type","Population","N","P","Mean","Median","CI","p-value")
+```
+
+
+#counts
+```{r}
+
+#Exitus:
+#totales
+#Total population"
+(Total_N<-DT[,.N])
+#Total Exitus"
+(Total_N_Exitus<-DT[icu_dead_before_28=='X1',.N])
+#Total Alive"
+(Total_N_Alive<-DT[icu_dead_before_28=='X0',.N])
+#Percentage Exitus"
+(Total_P_Exitus<-100*Total_N_Exitus/Total_N)
+
+d_res[nrow(d_res)+1,"Feature"]<-"Total population"
+d_res[nrow(d_res),"Type"]<-"Total"
+d_res[nrow(d_res),"N"]<-Total_N
+
+d_res[nrow(d_res)+1,"Feature"]<-"Total Exitus"
+d_res[nrow(d_res),"Type"]<-"Total"
+d_res[nrow(d_res),"Population"]<-"Exitus"
+d_res[nrow(d_res),"N"]<-Total_N_Exitus
+d_res[nrow(d_res),"P"]<-Total_P_Exitus
+
+d_res[nrow(d_res)+1,"Feature"]<-"Total Alive"
+d_res[nrow(d_res),"Type"]<-"Total"
+d_res[nrow(d_res),"Population"]<-"Alive"
+d_res[nrow(d_res),"N"]<-Total_N_Alive
+d_res[nrow(d_res),"P"]<-100-Total_P_Exitus
+
+#populations
+DT_Exitus<-DT[icu_dead_before_28=='X1',]
+DT_Alive<-DT[icu_dead_before_28=='X0',]
+```
+
+
+
+#specific fields
+```{r}
+#"pat_gender","adt_hos_age","icu_type_fservice","icd9d_m_chapter")
+#genre
+#Exitus:
+
+M_N_Exitus<-DT_Exitus[pat_gender==0,.N]
+M_P_Exitus<-100*DT_Exitus[pat_gender==0,.N]/Total_N_Exitus
+F_N_Exitus<-DT_Exitus[pat_gender==1,.N]
+F_P_Exitus<-100*DT_Exitus[pat_gender==1,.N]/Total_N_Exitus
+
+d_res[nrow(d_res)+1,"Feature"]<-"Gender Male"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Exitus"
+d_res[nrow(d_res),"N"]<-M_N_Exitus
+d_res[nrow(d_res),"P"]<-M_P_Exitus
+
+d_res[nrow(d_res)+1,"Feature"]<-"Gender Female"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Exitus"
+d_res[nrow(d_res),"N"]<-F_N_Exitus
+d_res[nrow(d_res),"P"]<-F_P_Exitus
+
+#Alive:
+M_N_Alive<-DT_Alive[pat_gender==0,.N]
+M_P_Alive<-100*DT_Alive[pat_gender==0,.N]/Total_N_Alive
+F_N_Alive<-DT_Alive[pat_gender==1,.N]
+F_P_Alive<-100*DT_Alive[pat_gender==1,.N]/Total_N_Alive
+
+d_res[nrow(d_res)+1,"Feature"]<-"Gender Male"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Alive"
+d_res[nrow(d_res),"N"]<-M_N_Alive
+d_res[nrow(d_res),"P"]<-M_P_Alive
+
+d_res[nrow(d_res)+1,"Feature"]<-"Gender Female"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Alive"
+d_res[nrow(d_res),"N"]<-F_N_Alive
+d_res[nrow(d_res),"P"]<-F_P_Alive
+
+# age (from raw data)
+# los datos no sigue una distribución normal, pero tampoco están muy escorados
+# utilizamos student, pero podría ser mejor wilcox.test
+# Exitus:
+
+
+t<-(DTRW[icu_dead_before_28==TRUE,t.test(adt_hos_age,na.rm <- TRUE)])
+V_MEAN<-DTRW[icu_dead_before_28==TRUE,mean(adt_hos_age,na.rm <- TRUE)]
+V_MEDIAN<-DTRW[icu_dead_before_28==TRUE,median(adt_hos_age,na.rm <- TRUE)]
+CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+d_res[nrow(d_res)+1,"Feature"]<-"Age Hos"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Exitus"
+d_res[nrow(d_res),"Mean"]<-V_MEAN
+d_res[nrow(d_res),"Median"]<-V_MEDIAN
+d_res[nrow(d_res),"CI"]<-CI
+d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+# Alive:
+
+t<-(DTRW[icu_dead_before_28==FALSE,t.test(adt_hos_age,na.rm <- TRUE)])
+V_MEAN<-DTRW[icu_dead_before_28==FALSE,mean(adt_hos_age,na.rm <- TRUE)]
+V_MEDIAN<-DTRW[icu_dead_before_28==FALSE,median(adt_hos_age,na.rm <- TRUE)]
+CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+d_res[nrow(d_res)+1,"Feature"]<-"Age Hos"
+d_res[nrow(d_res),"Type"]<-"Demographic"
+d_res[nrow(d_res),"Population"]<-"Alive"
+d_res[nrow(d_res),"Mean"]<-V_MEAN
+d_res[nrow(d_res),"Median"]<-V_MEDIAN
+d_res[nrow(d_res),"CI"]<-CI
+d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+
+```
+
+
+#tables
+```{r}
+print("--------------------------------------------------------------------------------")
+#icd9d_m_chapter
+# Exitus
+
+tbl<-table(DT_Exitus[,icd9d_m_chapter])
+ptable<-cbind(count<-tbl,percentage<-prop.table(tbl)*100)
+
+df_tbl<-data.frame(ptable)
+colnames(df_tbl)<-c("N","P")
+df_tbl<-cbind("Feature"=row.names(df_tbl),df_tbl)
+rownames(df_tbl)<-NULL
+
+df_tbl["Type"]<-"Icd9d_chapter"
+df_tbl["Population"]<-"Exitus" 
+df_tbl["Mean"]<-""
+df_tbl["Median"]<-""
+df_tbl["CI"]<-""
+df_tbl["p-value"]<-""
+
+d_res<-rbind(d_res,df_tbl)
+
+#Alive
+
+tbl<-table(DT_Alive[,icd9d_m_chapter])
+ptable<-cbind(count<-tbl,percentage<-prop.table(tbl)*100)
+
+df_tbl<-data.frame(ptable)
+colnames(df_tbl)<-c("N","P")
+df_tbl<-cbind("Feature"=row.names(df_tbl),df_tbl)
+rownames(df_tbl)<-NULL
+
+df_tbl["Type"]<-"Icd9d_chapter"
+df_tbl["Population"]<-"Alive" 
+df_tbl["Mean"]<-""
+df_tbl["Median"]<-""
+df_tbl["CI"]<-""
+df_tbl["p-value"]<-""
+
+d_res<-rbind(d_res,df_tbl)
+
+
+"icu_type_fservice"
+# Exitus
+
+tbl<-table(DT_Exitus[,icu_type_fservice])
+ptable<-cbind(count<-tbl,percentage<-prop.table(tbl)*100)
+
+df_tbl<-data.frame(ptable)
+colnames(df_tbl)<-c("N","P")
+df_tbl<-cbind("Feature"=row.names(df_tbl),df_tbl)
+rownames(df_tbl)<-NULL
+
+df_tbl["Type"]<-"Icu_type_fservice"
+df_tbl["Population"]<-"Exitus" 
+df_tbl["Mean"]<-""
+df_tbl["Median"]<-""
+df_tbl["CI"]<-""
+df_tbl["p-value"]<-""
+
+d_res<-rbind(d_res,df_tbl)
+
+
+# Alive
+tbl<-table(DT_Alive[,icu_type_fservice])
+ptable<-cbind(count<-tbl,percentage<-prop.table(tbl)*100)
+
+df_tbl<-data.frame(ptable)
+colnames(df_tbl)<-c("N","P")
+df_tbl<-cbind("Feature"=row.names(df_tbl),df_tbl)
+rownames(df_tbl)<-NULL
+
+df_tbl["Type"]<-"Icu_type_fservice"
+df_tbl["Population"]<-"Alive" 
+df_tbl["Mean"]<-""
+df_tbl["Median"]<-""
+df_tbl["CI"]<-""
+df_tbl["p-value"]<-""
+
+
+```
+
+
+```{r}
+list_demographics<-c("adt_readmit","icu_has_presc_insulin","icu_has_admiv_insulin","icu_has_admit_insulin","icu_stay_more72","diag_has_diabet","score_sofa_more4")
+
+
+list_medical<-c("med_has_infection","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_sepsis","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_24h_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc")
+
+list_comorbs<-c("com_congest_hea_failure","com_cardiac_arrhythmias","com_valvula_disease","com_pulmona_cir_disorders","com_periphe_vas_disorders","com_hypertension","com_paralysis","com_other_neur_disorders","com_chronic_pul_disease","com_diabetes_uncomplicated","com_diabetes_complicated","com_hypothyroidism","com_renal_failure","com_liver_disease","com_peptic_ulc_disease","com_aids","com_lymphoma","com_metastatic_cancer","com_solid_tum_wo_metastasis","com_rheumatoid_art_diseases","com_coagulopathy","com_obesity","com_weight_loss","com_fluid_elec_disorders","com_blood_los_anemia","com_deficiency_anemias","com_alcohol_abuse","com_drug_abuse","com_psychoses","com_depression")
+
+list_labs<-c("ph_avg_24h","ph_std_24h","po2_avg_24h","po2_std_24h","whiteblood_avg_24h","whiteblood_std_24h","lactate_avg_24h","lactate_std_24h","hemoglobin_avg_24h","hemoglobin_std_24h","pco2_avg_24h","pco2_std_24h","bicarbonate_avg_24h","bicarbonate_std_24h","creatinine_avg_24h","creatinine_std_24h","ph_avg_48h","ph_std_48h","po2_avg_48h","po2_std_48h","whiteblood_avg_48h","whiteblood_std_48h","lactate_avg_48h","lactate_std_48h","hemoglobin_avg_48h","hemoglobin_std_48h","pco2_avg_48h","pco2_std_48h","bicarbonate_avg_48h","bicarbonate_std_48h","creatinine_avg_48h","creatinine_std_48h","ph_avg_72h","ph_std_72h","po2_avg_72h","po2_std_72h","whiteblood_avg_72h","whiteblood_std_72h","lactate_avg_72h","lactate_std_72h","hemoglobin_avg_72h","hemoglobin_std_72h","pco2_avg_72h","pco2_std_72h","bicarbonate_avg_72h","bicarbonate_std_72h","creatinine_std_72h","creatinine_avg_72h","time_hipo_critical_sum_24h")
+
+list_glucose<-c("time_hipo_critical_sum_24h","time_hipo_moderate_sum_24h","time_hyper_gluce_sum_24h","time_range_protocol_sum_24h","time_range_clinic_sum_24h","glucose_variability_24h","time_hipo_critical_sum_48h","time_hipo_moderate_sum_48h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","time_range_clinic_sum_48h","glucose_variability_48h","time_hipo_critical_sum_72h","time_hipo_moderate_sum_72h","time_hyper_gluce_sum_72h","time_range_protocol_sum_72h","time_range_clinic_sum_72h","hipo_critical_percent_24h","hipo_moderate_percent_24h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","in_range_protocol_percent_24h","hipo_critical_percent_48h","hipo_moderate_percent_48h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","in_range_protocol_percent_48h","hipo_critical_percent_72h","hipo_moderate_percent_72h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","glucose_variability_72h")
+
+list_nutrition<-c("nut_tpn_in_24h","nut_npo_in_24h","nut_ppn_in_24h","nut_tfe_in_24h","nut_tpn_in_48h","nut_npo_in_48h","nut_ppn_in_48h","nut_tfe_in_48h","nut_tpn_in_72h","nut_npo_in_72h","nut_ppn_in_72h","nut_tfe_in_72h")
+
+```
+
+#demographs
+```{r}
+
+for (l in list_demographics){
+
+
+  #Exitus
+  N_Exitus<-DT_Exitus[get(l)==1,.N]
+  P_Exitus<-100*DT_Exitus[get(l)==1,.N]/Total_N_Exitus
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Exitus" 
+  d_res[nrow(d_res),"N"]<-N_Exitus
+  d_res[nrow(d_res),"P"]<-P_Exitus
+
+  
+  #Alive
+  N_Alive<-DT_Alive[get(l)==1,.N]
+  P_Alive<-100*DT_Alive[get(l)==1,.N]/Total_N_Alive
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Alive" 
+  d_res[nrow(d_res),"N"]<-N_Alive
+  d_res[nrow(d_res),"P"]<-P_Alive
+
+}
+
+```
+
+
+#medical
+```{r}
+
+for (l in list_medical){
+
+
+  #Exitus
+  N_Exitus<-DT_Exitus[get(l)==1,.N]
+  P_Exitus<-100*DT_Exitus[get(l)==1,.N]/Total_N_Exitus
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Exitus" 
+  d_res[nrow(d_res),"N"]<-N_Exitus
+  d_res[nrow(d_res),"P"]<-P_Exitus
+
+  
+  #Alive
+  N_Alive<-DT_Alive[get(l)==1,.N]
+  P_Alive<-100*DT_Alive[get(l)==1,.N]/Total_N_Alive
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Alive" 
+  d_res[nrow(d_res),"N"]<-N_Alive
+  d_res[nrow(d_res),"P"]<-P_Alive
+
+}
+
+```
+
+
+#comorbilidades
+```{r}
+
+for (l in list_comorbs){
+
+
+  #Exitus
+  N_Exitus<-DT_Exitus[get(l)==1,.N]
+  P_Exitus<-100*DT_Exitus[get(l)==1,.N]/Total_N_Exitus
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Exitus" 
+  d_res[nrow(d_res),"N"]<-N_Exitus
+  d_res[nrow(d_res),"P"]<-P_Exitus
+
+  
+  #Alive
+  N_Alive<-DT_Alive[get(l)==1,.N]
+  P_Alive<-100*DT_Alive[get(l)==1,.N]/Total_N_Alive
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Demographic"
+  d_res[nrow(d_res),"Population"]<-"Alive" 
+  d_res[nrow(d_res),"N"]<-N_Alive
+  d_res[nrow(d_res),"P"]<-P_Alive
+
+}
+```
+
+
+#labs
+```{r}
+for (l in list_labs){
+
+
+  
+  #Exitus
+  V_MEAN<-DT_Exitus[,mean(get(l),na.rm<-TRUE)]
+  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm<-TRUE)]
+  t<-(DT_Exitus[,t.test(get(l),na.rm <- TRUE)])
+  CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+  V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Labs"
+  d_res[nrow(d_res),"Population"]<-"Exitus"
+  d_res[nrow(d_res),"Mean"]<-V_MEAN
+  d_res[nrow(d_res),"Median"]<-V_MEDIAN
+  d_res[nrow(d_res),"CI"]<-CI
+  d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+
+  #Alive
+  V_MEAN<-DT_Alive[,mean(get(l),na.rm<-TRUE)]
+  V_MEDIAN<-DT_Alive[,median(get(l),na.rm<-TRUE)]
+  t<-(DT_Alive[,t.test(get(l),na.rm <- TRUE)])
+  CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+  V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Labs"
+  d_res[nrow(d_res),"Population"]<-"Alive"
+  d_res[nrow(d_res),"Mean"]<-V_MEAN
+  d_res[nrow(d_res),"Median"]<-V_MEDIAN
+  d_res[nrow(d_res),"CI"]<-CI
+  d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+
+}
+```
+
+
+#glucemia
+```{r}
+for (l in list_glucose){
+
+  #Exitus
+  V_MEAN<-DT_Exitus[,mean(get(l),na.rm<-TRUE)]
+  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm<-TRUE)]
+  t<-(DT_Exitus[,t.test(get(l),na.rm <- TRUE)])
+  CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+  V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Glucose"
+  d_res[nrow(d_res),"Population"]<-"Exitus"
+  d_res[nrow(d_res),"Mean"]<-V_MEAN
+  d_res[nrow(d_res),"Median"]<-V_MEDIAN
+  d_res[nrow(d_res),"CI"]<-CI
+  d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+
+  #Alive
+  V_MEAN<-DT_Alive[,mean(get(l),na.rm<-TRUE)]
+  V_MEDIAN<-DT_Alive[,median(get(l),na.rm<-TRUE)]
+  t<-(DT_Alive[,t.test(get(l),na.rm <- TRUE)])
+  CI<-paste(t$conf.int[1],"-",t$conf.int[2])
+  V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Glucose"
+  d_res[nrow(d_res),"Population"]<-"Alive"
+  d_res[nrow(d_res),"Mean"]<-V_MEAN
+  d_res[nrow(d_res),"Median"]<-V_MEDIAN
+  d_res[nrow(d_res),"CI"]<-CI
+  d_res[nrow(d_res),"p-value"]<-V_PVALUE
+
+  
+}
+```
+
+
+#nutrition
+```{r}
+
+for (l in list_nutrition){
+
+
+  #Exitus
+  N_Exitus<-DT_Exitus[get(l)==1,.N]
+  P_Exitus<-100*DT_Exitus[get(l)==1,.N]/Total_N_Exitus
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Nutrition"
+  d_res[nrow(d_res),"Population"]<-"Exitus" 
+  d_res[nrow(d_res),"N"]<-N_Exitus
+  d_res[nrow(d_res),"P"]<-P_Exitus
+
+  
+  #Alive
+  N_Alive<-DT_Alive[get(l)==1,.N]
+  P_Alive<-100*DT_Alive[get(l)==1,.N]/Total_N_Alive
+
+  d_res[nrow(d_res)+1,"Feature"]<-l
+  d_res[nrow(d_res),"Type"]<-"Nutrition"
+  d_res[nrow(d_res),"Population"]<-"Alive" 
+  d_res[nrow(d_res),"N"]<-N_Alive
+  d_res[nrow(d_res),"P"]<-P_Alive
+  
+}
+```
