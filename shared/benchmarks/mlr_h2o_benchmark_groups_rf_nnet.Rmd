@@ -8,6 +8,7 @@ output:
 
 ```{r}
 require(mlr)
+require(ggplot2)
 ```
 
 
@@ -19,7 +20,7 @@ set.seed(1000)
 
 #load results
 ```{r}
-load (file="~/shared/results/bmr_rf_net")
+load (file="~/shared/results/bmr_rf_nnet")
 ```
 
 ```{r}
@@ -31,11 +32,6 @@ bmr
 ```{r}
 plotBMRBoxplots(bmr,measure = auc)
 plotBMRBoxplots(bmr,measure = mmce)
-```
-
-#numeric results
-```{r}
-
 ```
 
 
@@ -52,18 +48,9 @@ plotBMRBoxplots(bmr, measure = mmce, style = "violin", pretty.names = TRUE, face
 ```
 
 
-```{r}
-bmr
-```
-
-
 #auc total
 ```{r}
 bmr$results
-
-
-df = generateThreshVsPerfData(bmr$results$total, measures = list(fpr,tpr,mmce))
-plotROCCurves(df)
 
 ```
 

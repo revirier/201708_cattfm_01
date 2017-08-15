@@ -21,13 +21,9 @@ load('~/shared/datasets/ds_icu_pm_complete_2')
 DT<-data.table(ds_icu_pm_2)
 ```
 
-```{r}
-View(DT)
-```
-
 #data frame to save results
 ```{r}
-d_res<-data.frame(matrix(ncol<-9,nrow<-0))
+d_res<-data.frame(matrix(ncol=9,nrow=0))
 colnames(d_res)<-c("Feature","Type","Population","N","P","Mean","Median","CI","p-value")
 ```
 
@@ -116,9 +112,9 @@ d_res[nrow(d_res),"P"]<-F_P_Alive
 # Exitus:
 
 
-t<-(DTRW[icu_dead_before_28==TRUE,t.test(adt_hos_age,na.rm <- TRUE)])
-V_MEAN<-DTRW[icu_dead_before_28==TRUE,mean(adt_hos_age,na.rm <- TRUE)]
-V_MEDIAN<-DTRW[icu_dead_before_28==TRUE,median(adt_hos_age,na.rm <- TRUE)]
+t<-(DTRW[icu_dead_before_28==TRUE,t.test(adt_hos_age,na.rm = TRUE)])
+V_MEAN<-DTRW[icu_dead_before_28==TRUE,mean(adt_hos_age,na.rm = TRUE)]
+V_MEDIAN<-DTRW[icu_dead_before_28==TRUE,median(adt_hos_age,na.rm = TRUE)]
 CI<-paste(t$conf.int[1],"-",t$conf.int[2])
 V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
@@ -132,9 +128,9 @@ d_res[nrow(d_res),"p-value"]<-V_PVALUE
 
 # Alive:
 
-t<-(DTRW[icu_dead_before_28==FALSE,t.test(adt_hos_age,na.rm <- TRUE)])
-V_MEAN<-DTRW[icu_dead_before_28==FALSE,mean(adt_hos_age,na.rm <- TRUE)]
-V_MEDIAN<-DTRW[icu_dead_before_28==FALSE,median(adt_hos_age,na.rm <- TRUE)]
+t<-(DTRW[icu_dead_before_28==FALSE,t.test(adt_hos_age,na.rm = TRUE)])
+V_MEAN<-DTRW[icu_dead_before_28==FALSE,mean(adt_hos_age,na.rm = TRUE)]
+V_MEDIAN<-DTRW[icu_dead_before_28==FALSE,median(adt_hos_age,na.rm = TRUE)]
 CI<-paste(t$conf.int[1],"-",t$conf.int[2])
 V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
@@ -152,7 +148,7 @@ d_res[nrow(d_res),"p-value"]<-V_PVALUE
 
 #tables
 ```{r}
-print("--------------------------------------------------------------------------------")
+
 #icd9d_m_chapter
 # Exitus
 
@@ -193,7 +189,7 @@ df_tbl["p-value"]<-""
 d_res<-rbind(d_res,df_tbl)
 
 
-"icu_type_fservice"
+#"icu_type_fservice"
 # Exitus
 
 tbl<-table(DT_Exitus[,icu_type_fservice])
@@ -352,9 +348,9 @@ for (l in list_labs){
 
   
   #Exitus
-  V_MEAN<-DT_Exitus[,mean(get(l),na.rm<-TRUE)]
-  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm<-TRUE)]
-  t<-(DT_Exitus[,t.test(get(l),na.rm <- TRUE)])
+  V_MEAN<-DT_Exitus[,mean(get(l),na.rm = TRUE)]
+  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm = TRUE)]
+  t<-(DT_Exitus[,t.test(get(l),na.rm = TRUE)])
   CI<-paste(t$conf.int[1],"-",t$conf.int[2])
   V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
@@ -368,9 +364,9 @@ for (l in list_labs){
 
 
   #Alive
-  V_MEAN<-DT_Alive[,mean(get(l),na.rm<-TRUE)]
-  V_MEDIAN<-DT_Alive[,median(get(l),na.rm<-TRUE)]
-  t<-(DT_Alive[,t.test(get(l),na.rm <- TRUE)])
+  V_MEAN<-DT_Alive[,mean(get(l),na.rm = TRUE)]
+  V_MEDIAN<-DT_Alive[,median(get(l),na.rm = TRUE)]
+  t<-(DT_Alive[,t.test(get(l),na.rm = TRUE)])
   CI<-paste(t$conf.int[1],"-",t$conf.int[2])
   V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
@@ -392,9 +388,9 @@ for (l in list_labs){
 for (l in list_glucose){
 
   #Exitus
-  V_MEAN<-DT_Exitus[,mean(get(l),na.rm<-TRUE)]
-  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm<-TRUE)]
-  t<-(DT_Exitus[,t.test(get(l),na.rm <- TRUE)])
+  V_MEAN<-DT_Exitus[,mean(get(l),na.rm = TRUE)]
+  V_MEDIAN<-DT_Exitus[,median(get(l),na.rm = TRUE)]
+  t<-(DT_Exitus[,t.test(get(l),na.rm = TRUE)])
   CI<-paste(t$conf.int[1],"-",t$conf.int[2])
   V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
@@ -408,9 +404,9 @@ for (l in list_glucose){
 
 
   #Alive
-  V_MEAN<-DT_Alive[,mean(get(l),na.rm<-TRUE)]
-  V_MEDIAN<-DT_Alive[,median(get(l),na.rm<-TRUE)]
-  t<-(DT_Alive[,t.test(get(l),na.rm <- TRUE)])
+  V_MEAN<-DT_Alive[,mean(get(l),na.rm = TRUE)]
+  V_MEDIAN<-DT_Alive[,median(get(l),na.rm = TRUE)]
+  t<-(DT_Alive[,t.test(get(l),na.rm = TRUE)])
   CI<-paste(t$conf.int[1],"-",t$conf.int[2])
   V_PVALUE<-if(t$p.value<2.2e-16){"< 2.2e-16"} else {t$p.value}
 
