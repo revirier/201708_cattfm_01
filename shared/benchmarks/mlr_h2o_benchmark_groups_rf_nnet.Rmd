@@ -93,6 +93,9 @@ plt=plotBMRRanksAsBarChart(bmr, pos = "tile", measure=auc)
 plt+ggtitle("auc rank")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
+
 #Hypothesis test
 ```{r}
 
@@ -103,7 +106,7 @@ friedmanTestBMR(bmr,mmce)
 friedmanPostHocTestBMR(bmr,p.value=0.05,auc)
 friedmanPostHocTestBMR(bmr,p.value=0.05,mmce)
 
-g = generateCritDifferencesData(bmr, p.value = 0.05, test = "bd",auc,baseline = "classif.h2o.gbm")
+g = generateCritDifferencesData(bmr, p.value = 0.05, test = "bd",auc,baseline = "classif.h2o.randomForest")
 plt=plotCritDifferences(g) + coord_cartesian(xlim = c(-1,5), ylim = c(0,2))
 plt+ggtitle("critical diferences, test bd, auc")+
   theme(plot.title = element_text(hjust = 0.5))
