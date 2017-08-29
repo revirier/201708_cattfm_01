@@ -452,3 +452,9 @@ for (l in list_nutrition){
   
 }
 ```
+
+
+```{r}
+View(d_res)
+```
+

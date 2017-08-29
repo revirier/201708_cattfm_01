@@ -66,7 +66,7 @@ plotROCCurves(df)
 
 #summary
 ```{r}
-plt=plotBMRSummary(bmr)
+plt=plotBMRSummary(bmr,measure = auc)
 plt+ggtitle("Benchmark aggregate Summary")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -93,8 +93,6 @@ plt=plotBMRRanksAsBarChart(bmr, pos = "tile", measure=auc)
 plt+ggtitle("auc rank")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-
 
 #Hypothesis test
 ```{r}

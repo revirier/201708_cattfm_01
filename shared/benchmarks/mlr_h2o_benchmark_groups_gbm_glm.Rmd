@@ -55,7 +55,6 @@ plotBMRBoxplots(bmr, measure = mmce, style = "violin", pretty.names = TRUE, face
 ```{r}
 bmr$results
 
-
 ```
 
 
@@ -70,7 +69,7 @@ plotROCCurves(df)
 
 #summary
 ```{r}
-plt=plotBMRSummary(bmr)
+plt=plotBMRSummary(bmr,measure = auc)
 plt+ggtitle("Benchmark aggregate Summary")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
