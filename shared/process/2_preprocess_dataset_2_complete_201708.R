@@ -95,10 +95,10 @@ stdl<-names(ds_icu_pm_2[grep("_std_",names(ds_icu_pm_2))])
 
 
 #GLUCOSE_VARIABILITY_ICU
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_icu>500]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_24h>300]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_48h>300]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_72h>300]
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_icu>500]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_24h>300]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_48h>300]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_72h>300]<-NA
 
 
 #NUT_TPN
@@ -177,6 +177,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-save(file="~/shared/datasets/ds_icu_pm_complete_2",ds_icu_pm_2)
+#save(file="~/shared/datasets/ds_icu_pm_complete_2",ds_icu_pm_2)
 
 

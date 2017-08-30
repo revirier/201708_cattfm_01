@@ -19,6 +19,7 @@ h2o.init(nthreads=-1, max_mem_size = "7G")
 
 # LOAD DATASET
 load("~/shared/datasets/ds_icu_pm_complete_2")
+#load("~/shared/datasets/ds_icu_pm_only_glucose_2")
 
 
 #variables

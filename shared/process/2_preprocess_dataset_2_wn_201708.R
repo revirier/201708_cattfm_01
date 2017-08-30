@@ -110,10 +110,11 @@ stdl<-names(ds_icu_pm_2[grep("_std_",names(ds_icu_pm_2))])
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% stdl)]
 
 #GLUCOSE_VARIABILITY_ICU
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_icu>500]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_24h>300]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_48h>300]
-ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_72h>300]
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_icu>500]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_24h>300]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_48h>300]<-NA
+ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_72h>300]<-NA
+
 
 #DELETE TIME_
 #finally didnt include any TIME_
@@ -202,6 +203,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-save(file="~/shared/datasets/ds_icu_pm_2",ds_icu_pm_2)
+#save(file="~/shared/datasets/ds_icu_pm_2",ds_icu_pm_2)
 
 

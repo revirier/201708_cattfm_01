@@ -1,0 +1,90 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+
+# LOAD DATASET
+load("~/shared/results/lmdl_201808_01_total")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+```{r}
+summary(lmdl)
+```
+
+
+```{r}
+
+#AUC
+tauc<-paste(format(lmdl@model$training_metrics@metrics$AUC,digits=3),"Train")
+vauc<-paste(format(lmdl@model$validation_metrics@metrics$AUC,digits=3),"Validation")
+cvauc<-paste(format(lmdl@model$cross_validation_metrics@metrics$AUC,digits=3),"Cross Val")
+
+```
+
+#coeficients
+```{r}
+h2o.coef(lmdl)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(lmdl)
+
+```
+
+#coeficients table
+```{r}
+View(lmdl@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(lmdl,50)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = lmdl@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = lmdl@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = lmdl@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = lmdl@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_cv = lmdl@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_cv = lmdl@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='green')
+lines(fpr_cv,tpr_cv,type='l',col='red')
+legend("bottomright",c(tauc,vauc,cvauc),col=c("black","green","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(lmdl,valid=FALSE) # on train
+h2o.auc(lmdl,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+lmdl@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+
