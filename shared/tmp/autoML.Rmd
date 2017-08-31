@@ -1,0 +1,74 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+#start h2o
+
+h2o.init(nthreads=-1, max_mem_size = "7G")
+#h2o.removeAll()
+#h2o.shutdown(prompt = FALSE)
+
+# LOAD DATASET
+load("~/shared/datasets/ds_icu_pm_complete_2")
+#load("~/shared/datasets/ds_icu_pm_only_glucose_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+#dataset total
+```{r}
+
+
+train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+d_train<-ds_icu_pm_2[train,]
+d_test<-ds_icu_pm_2[-train,]
+  
+
+aml <- h2o.automl( y = y,
+                  training_frame = as.h2o(d_train),
+                  leaderboard_frame = as.h2o(d_test),
+                  max_runtime_secs = 30)
+
+# View the AutoML Leaderboard
+lb <- aml@leaderboard
+lb
+
+#                                  model_id       auc    logloss
+#  StackedEnsemble_0_AutoML_20170605_212658  0.776164   0.564872
+# GBM_grid_0_AutoML_20170605_212658_model_2  0.753550   0.587546
+#              DRF_0_AutoML_20170605_212658  0.738885   0.611997
+# GBM_grid_0_AutoML_20170605_212658_model_0  0.735078   0.630062
+# GBM_grid_0_AutoML_20170605_212658_model_1  0.730645   0.674580
+#              XRT_0_AutoML_20170605_212658  0.728358   0.629296
+# GLM_grid_0_AutoML_20170605_212658_model_1  0.685216   0.635137
+# GLM_grid_0_AutoML_20170605_212658_model_0  0.685216   0.635137
+#
+# [8 rows x 3 columns]
+
+# The leader model is stored here
+aml@leader
+
+
+# If you need to generate predictions on a test set, you can make
+# predictions directly on the `"H2OAutoML"` object, or on the leader
+# model object directly
+
+pred <- h2o.predict(aml, test)  # predict(aml, test) also works
+
+# or:
+pred <- h2o.predict(aml@leader, test)
+
+```
