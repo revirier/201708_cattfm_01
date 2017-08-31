@@ -47,7 +47,7 @@ RUN echo 'if ("h2o" %in% rownames(installed.packages())) { remove.packages("h2o"
 RUN echo 'pkgs <- c("statmod","RCurl","jsonlite") \n for (pkg in pkgs) { if (! (pkg %in% rownames(installed.packages()))) { install.packages(pkg) }}' > /tmp/packages.R \
     && Rscript /tmp/packages.R
 
-RUN echo 'install.packages("h2o", type="source", repos="http://h2o-release.s3.amazonaws.com/h2o/rel-vajda/4/R")' > /tmp/packages.R \
+RUN echo 'install.packages("h2o", type="source", repos="https://h2o-release.s3.amazonaws.com/h2o/rel-weierstrass/2/R")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
 
 RUN echo 'install.packages("caret")' > /tmp/packages.R \
