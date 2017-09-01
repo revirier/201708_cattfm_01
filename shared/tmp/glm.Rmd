@@ -1,0 +1,57 @@
+
+
+```{r}
+
+
+require(caret)
+require(pROC)
+install.packages("e1071")
+
+#random seed
+
+set.seed(1000)
+
+
+# LOAD DATASET
+load("~/shared/datasets/ds_icu_pm_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+```{r}
+
+ds_group<-ds_icu_pm_2
+train<-createDataPartition(y=ds_group$icu_dead_before_28,p=.60,list = FALSE)
+d_train<-ds_group[train,]
+d_test<-ds_group[-train,]
+
+
+lglm<-train(icu_dead_before_28 ~ .,data=d_train,family="binomial",method="glm")
+
+summary(lglm)
+```
+```{r}
+logmodel<-lglm
+
+p<-predict(logmodel,newdata=d_test,type="prob")
+
+
+f1<-roc(d_test$icu_dead_before_28,p$X1)
+plot(f1)
+
+f1
+
+```
+
+```{r}
+
+lglm<-glm(icu_dead_before_28 ~ .,data=d_train,family=binomial())
+
+
+step(lglm,direction = "both")
+```
+
