@@ -73,6 +73,8 @@ RUN echo 'install.packages("doMC")' > /tmp/packages.R \
 RUN echo 'install.packages("PMCMR")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
 
+RUN echo 'install.packages("e1071")' > /tmp/packages.R \
+    && Rscript /tmp/packages.R
 # h2o ports
 EXPOSE 54321
 EXPOSE 54322
