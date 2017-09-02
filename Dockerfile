@@ -78,6 +78,7 @@ RUN echo 'install.packages("e1071")' > /tmp/packages.R \
 
 RUN R CMD javareconf
 
+RUN apt-get update &&\ 
 DEBIAN_FRONTEND=noninteractive apt-get -qq install libicu-dev libbz2-dev liblzma-dev
 
 RUN echo 'install.packages("FSelector")' > /tmp/packages.R \
