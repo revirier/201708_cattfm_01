@@ -75,6 +75,17 @@ RUN echo 'install.packages("PMCMR")' > /tmp/packages.R \
 
 RUN echo 'install.packages("e1071")' > /tmp/packages.R \
     && Rscript /tmp/packages.R
+
+RUN R CMD javareconf
+
+DEBIAN_FRONTEND=noninteractive apt-get -qq install libicu-dev libbz2-dev liblzma-dev
+
+RUN echo 'install.packages("FSelector")' > /tmp/packages.R \
+    && Rscript /tmp/packages.R
+
+RUN echo 'install.packages("randomForestSRC")' > /tmp/packages.R \
+    && Rscript /tmp/packages.R
+
 # h2o ports
 EXPOSE 54321
 EXPOSE 54322
