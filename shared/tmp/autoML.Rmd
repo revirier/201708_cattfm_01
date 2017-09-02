@@ -72,3 +72,12 @@ pred <- h2o.predict(aml, test)  # predict(aml, test) also works
 pred <- h2o.predict(aml@leader, test)
 
 ```
+```{r}
+load(file="~/shared/results/aml_20170831")
+```
+
+```{r}
+aml@leaderboard
+```
+
+

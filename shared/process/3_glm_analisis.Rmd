@@ -18,7 +18,8 @@ h2o.init(nthreads=-1, max_mem_size = "7G")
 #h2o.shutdown(prompt = FALSE)
 
 # LOAD DATASET
-load("~/shared/datasets/ds_icu_pm_complete_2")
+load("~/shared/datasets/ds_icu_pm_complete__no_fact_2")
+#load("~/shared/datasets/ds_icu_pm_complete_2")
 #load("~/shared/datasets/ds_icu_pm_only_glucose_2")
 
 
@@ -57,7 +58,7 @@ time_train<-system.time(glm_iter <- h2o.glm(y = y,
                                               )
 lmdl<-glm_iter
 
-save(lmdl,file="~/shared/results/lmdl_201808_01_total")
+save(lmdl,file="~/shared/results/lmdl_201809_01_total_no_fact")
 
 ```
 
@@ -72,6 +73,14 @@ summary(lmdl)
 tauc<-paste(format(lmdl@model$training_metrics@metrics$AUC,digits=3),"Train")
 vauc<-paste(format(lmdl@model$validation_metrics@metrics$AUC,digits=3),"Validation")
 cvauc<-paste(format(lmdl@model$cross_validation_metrics@metrics$AUC,digits=3),"Cross Val")
+
+
+lmdl@model$training_metrics@metrics$AUC
+lmdl@model$validation_metrics@metrics$AUC
+lmdl@model$cross_validation_metrics@metrics$AUC
+
+
+
 
 ```
 
@@ -93,7 +102,7 @@ View(lmdl@model$coefficients_table)
 
 #variable importance
 ```{r}
-h2o.std_coef_plot(glm_iter)
+h2o.std_coef_plot(lmdl,50)
 ```
 
 

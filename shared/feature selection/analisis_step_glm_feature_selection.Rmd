@@ -1,0 +1,301 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+#start h2o
+
+h2o.init(nthreads=-1, max_mem_size = "10G")
+#h2o.removeAll()
+#h2o.shutdown(prompt = FALSE)
+
+# LOAD DATASET
+load("~/shared/datasets/ds_icu_pm_complete_2")
+#load("~/shared/datasets/ds_icu_pm_only_glucose_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+#dataset total
+```{r}
+
+lmdl<-list()
+
+train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+d_train<-ds_icu_pm_2[train,]
+d_test<-ds_icu_pm_2[-train,]
+```  
+
+#model total
+```{r}
+lglm<-glm(icu_dead_before_28 ~ .,data=d_train,family=binomial())
+
+
+step(lglm,direction = "both")
+```
+
+
+#model result forward_back selection
+```{r}
+g4<-glm(formula = icu_dead_before_28 ~ adt_hos_age + icu_type_fservice + 
+    icu_has_presc_insulin + icu_has_admiv_insulin + icu_stay_more72 + 
+    icd9d_m_chapter + com_cardiac_arrhythmias + com_pulmona_cir_disorders + 
+    com_hypertension + com_other_neur_disorders + com_chronic_pul_disease + 
+    com_diabetes_uncomplicated + com_diabetes_complicated + com_hypothyroidism + 
+    com_liver_disease + com_lymphoma + com_metastatic_cancer + 
+    com_solid_tum_wo_metastasis + com_obesity + com_fluid_elec_disorders + 
+    com_deficiency_anemias + com_drug_abuse + com_psychoses + 
+    com_depression + score_sofa + med_has_infection + med_has_explicit_sepsis + 
+    med_has_organ_dysfunction + med_has_vaso + med_has_24h_vaso + 
+    med_has_dialysis + med_has_mechvent + med_has_esteroid_presc + 
+    ph_avg_24h + ph_std_24h + po2_std_24h + whiteblood_std_24h + 
+    lactate_avg_24h + hemoglobin_std_24h + pco2_avg_24h + pco2_std_24h + 
+    bicarbonate_avg_24h + bicarbonate_std_24h + creatinine_std_24h + 
+    po2_avg_48h + whiteblood_avg_48h + whiteblood_std_48h + lactate_avg_48h + 
+    hemoglobin_std_48h + pco2_avg_48h + creatinine_std_48h + 
+    whiteblood_std_72h + lactate_avg_72h + pco2_avg_72h + pco2_std_72h + 
+    bicarbonate_avg_72h + creatinine_std_72h + time_hyper_gluce_sum_24h + 
+    time_hyper_gluce_sum_48h + time_range_protocol_sum_48h + 
+    time_range_clinic_sum_48h + glucose_variability_48h + time_hyper_gluce_sum_72h + 
+    time_range_protocol_sum_72h + time_range_clinic_sum_72h + 
+    hyper_gluce_percent_24h + in_range_clinic_percent_24h + hyper_gluce_percent_48h + 
+    in_range_clinic_percent_48h + in_range_protocol_percent_48h + 
+    hipo_critical_percent_72h + in_range_protocol_percent_72h + 
+    nut_tpn_in_24h + nut_npo_in_24h + nut_tfe_in_24h + nut_npo_in_48h + 
+    nut_ppn_in_48h + nut_tfe_in_48h + nut_npo_in_72h + nut_tfe_in_72h + 
+    diag_has_diabet, family = binomial(), data = d_train)
+
+```
+
+
+```{r}
+
+#glm feature selected 
+
+c_selected=c("icu_dead_before_28","adt_hos_age","icu_type_fservice","
+    icu_has_presc_insulin","icu_has_admiv_insulin","icu_stay_more72","
+    icd9d_m_chapter","com_cardiac_arrhythmias","com_pulmona_cir_disorders","
+    com_hypertension","com_other_neur_disorders","com_chronic_pul_disease","
+    com_diabetes_uncomplicated","com_diabetes_complicated","com_hypothyroidism","
+    com_liver_disease","com_lymphoma","com_metastatic_cancer","
+    com_solid_tum_wo_metastasis","com_obesity","com_fluid_elec_disorders","
+    com_deficiency_anemias","com_drug_abuse","com_psychoses","
+    com_depression","score_sofa","med_has_infection","med_has_explicit_sepsis","
+    med_has_organ_dysfunction","med_has_vaso","med_has_24h_vaso","
+    med_has_dialysis","med_has_mechvent","med_has_esteroid_presc","
+    ph_avg_24h","ph_std_24h","po2_std_24h","whiteblood_std_24h","
+    lactate_avg_24h","hemoglobin_std_24h","pco2_avg_24h","pco2_std_24h","
+    bicarbonate_avg_24h","bicarbonate_std_24h","creatinine_std_24h","
+    po2_avg_48h","whiteblood_avg_48h","whiteblood_std_48h","lactate_avg_48h","
+    hemoglobin_std_48h","pco2_avg_48h","creatinine_std_48h","
+    whiteblood_std_72h","lactate_avg_72h","pco2_avg_72h","pco2_std_72h","
+    bicarbonate_avg_72h","creatinine_std_72h","time_hyper_gluce_sum_24h","
+    time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","
+    time_range_clinic_sum_48h","glucose_variability_48h","time_hyper_gluce_sum_72h","
+    time_range_protocol_sum_72h","time_range_clinic_sum_72h","
+    hyper_gluce_percent_24h","in_range_clinic_percent_24h","hyper_gluce_percent_48h","
+    in_range_clinic_percent_48h","in_range_protocol_percent_48h","
+    hipo_critical_percent_72h","in_range_protocol_percent_72h","
+    nut_tpn_in_24h","nut_npo_in_24h","nut_tfe_in_24h","nut_npo_in_48h","
+    nut_ppn_in_48h","nut_tfe_in_48h","nut_npo_in_72h","nut_tfe_in_72h","
+    diag_has_diabet")
+
+d_train_sel<-d_train[,which(colnames(d_train) %in% c_selected)]
+d_test_sel<-d_test[,which(colnames(d_train) %in% c_selected)]
+
+
+time_train<-system.time(glm_iter <- h2o.glm(y = y,
+                                              training_frame = as.h2o(d_train_sel),
+                                              validation_frame = as.h2o(d_test_sel),
+                                              family = "binomial",
+                                              link="logit",
+                                              balance_classes = TRUE,
+                                              lambda = 0,
+                                              standardize=TRUE,
+                                              remove_collinear_columns=TRUE,
+                                              compute_p_values=TRUE,
+                                              nfolds = 10,
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1)
+                                              )
+lmdl_s<-glm_iter
+
+save(lmdl_s,file="~/shared/results/lmdl_s_201809_01_select_features_step")
+
+```
+
+```{r}
+load(file="~/shared/results/lmdl_s_201809_01_select_features_step")
+```
+
+
+
+```{r}
+summary(lmdl_s)
+```
+
+
+```{r}
+
+#AUC
+tauc<-paste(format(lmdl_s@model$training_metrics@metrics$AUC,digits=3),"Train")
+vauc<-paste(format(lmdl_s@model$validation_metrics@metrics$AUC,digits=3),"Validation")
+cvauc<-paste(format(lmdl_s@model$cross_validation_metrics@metrics$AUC,digits=3),"Cross Val")
+
+```
+
+#coeficients
+```{r}
+h2o.coef(lmdl_s)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(lmdl_s)
+```
+
+#coeficients table
+```{r}
+View(lmdl_s@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(lmdl_s)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = lmdl_s@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = lmdl_s@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = lmdl_s@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = lmdl_s@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_cv = lmdl_s@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_cv = lmdl_s@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='green')
+lines(fpr_cv,tpr_cv,type='l',col='red')
+legend("bottomright",c(tauc,vauc,cvauc),col=c("black","green","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(lmdl_s,valid=FALSE) # on train
+h2o.auc(lmdl_s,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+lmdl_s@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+
+
+```{r}
+
+#glm full 
+time_train<-system.time(glm_iter <- h2o.glm(y = y,
+                                              training_frame = as.h2o(d_train),
+                                              validation_frame = as.h2o(d_test),
+                                              family = "binomial",
+                                              link="logit",
+                                              balance_classes = TRUE,
+                                              lambda = 0,
+                                              standardize=TRUE,
+                                              remove_collinear_columns=TRUE,
+                                              compute_p_values=TRUE,
+                                              nfolds = 10,
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1)
+                                              )
+lmdl<-glm_iter
+
+save(lmdl,file="~/shared/results/lmdl_201808_01_total")
+
+```
+
+```{r}
+summary(lmdl)
+```
+
+
+```{r}
+
+#AUC
+tauc<-paste(format(lmdl@model$training_metrics@metrics$AUC,digits=3),"Train")
+vauc<-paste(format(lmdl@model$validation_metrics@metrics$AUC,digits=3),"Validation")
+cvauc<-paste(format(lmdl@model$cross_validation_metrics@metrics$AUC,digits=3),"Cross Val")
+
+```
+
+#coeficients
+```{r}
+h2o.coef(lmdl)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(lmdl)
+```
+
+#coeficients table
+```{r}
+View(lmdl@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(lmdl)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = lmdl@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = lmdl@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = lmdl@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = lmdl@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_cv = lmdl@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_cv = lmdl@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='green')
+lines(fpr_cv,tpr_cv,type='l',col='red')
+legend("bottomright",c(tauc,vauc,cvauc),col=c("black","green","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(lmdl,valid=FALSE) # on train
+h2o.auc(lmdl,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+lmdl@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+
+
