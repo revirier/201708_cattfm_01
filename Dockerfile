@@ -35,6 +35,9 @@ RUN \
 
 RUN chown -R rstudio:rstudio /home/rstudio
 
+#shell
+RUN chsh -s /bin/bash rstudio
+
 # Fetch h2o R latest_stable
 
 # install packages
