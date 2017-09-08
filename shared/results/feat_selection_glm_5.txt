@@ -1,0 +1,6 @@
+maxit=300
+alpha=0.01
+beta=-0.001
+tune=true
+tune list meausure auc
+cv 5

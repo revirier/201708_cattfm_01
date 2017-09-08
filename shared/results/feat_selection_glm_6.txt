@@ -1,0 +1,4 @@
+maxit = 500, 
+max.features = NA_integer_,
+alpha = 0.001, 
+beta=-0.0005

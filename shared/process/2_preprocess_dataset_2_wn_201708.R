@@ -1,10 +1,11 @@
 ---
 # preprocess dataframe before analytics
-# without normalize
+# like the TFM but without normalize
   
 # 20170807
 # load from dataset 2
 
+#ds_icu_pm_2 20445 obs 79 vars
 ---
   
 #libraries
@@ -92,8 +93,11 @@ ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_oasis"))]
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_qsofa"))]
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_saps"))]
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_sirs"))]
+
+#STD
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("ph_avg_48h","po2_avg_48h","lactate_avg_48h","pco2_avg_48h","ph_avg_72h",
-                                                           "po2_avg_72h","lactate_avg_72h","pco2_avg_72h","ph_std_48h","po2_std_48h","lactate_std_48h","pco2_std_48h","ph_std_72h",
+                                                           "po2_avg_72h","lactate_avg_72h","pco2_avg_72h",
+                                                           "ph_std_48h","po2_std_48h","lactate_std_48h","pco2_std_48h","ph_std_72h",
                                                            "po2_std_72h","lactate_std_72h","pco2_std_72h"))]
 
 

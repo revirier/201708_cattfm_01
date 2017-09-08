@@ -1,0 +1,200 @@
+
+
+```{r}
+
+require(h2o)
+require(caret)
+require(pROC)
+require(dplyr)
+
+#random seed
+
+set.seed(1000)
+
+#start h2o
+
+h2o.init(nthreads=-1, max_mem_size = "10G")
+#h2o.removeAll()
+#h2o.shutdown(prompt = FALSE)
+
+# LOAD DATASET
+#load("~/shared/datasets/ds_icu_pm_complete_2")
+load("~/shared/datasets/ds_icu_pm_complete__no_fact_2")
+#load("~/shared/datasets/ds_icu_pm_only_glucose_2")
+
+
+#variables
+y<-"icu_dead_before_28"
+
+```
+
+
+#dataset total
+```{r}
+
+
+train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+d_train<-ds_icu_pm_2[train,]
+d_test<-ds_icu_pm_2[-train,]
+```  
+
+
+#load feature selction results
+```{r}
+load(file = "~/shared/results/feat_selection_glm_5")
+```
+
+```{r}
+sfeats
+```
+
+```{r}
+#glm feature selected 
+#maxit 100
+#alpha 0.01
+#beta -0.001
+#Holdout
+#40 features
+#mmce.test.mean=0.154
+#feat_selection_glm_2
+c_selected_2=c("icu_dead_before_28","adt_hos_age","icu_type_fservice","icu_has_presc_insulin","icu_has_admit_insulin","icu_stay_more72","icd9d_m_chapter","com_hypertension","com_liver_disease","com_metastatic_cancer","com_fluid_elec_disorders","score_sofa","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","ph_avg_24h","pco2_avg_24h","creatinine_avg_24h","ph_avg_48h","whiteblood_avg_48h","lactate_avg_48h","creatinine_avg_48h","lactate_avg_72h","bicarbonate_avg_72h","time_hyper_gluce_sum_72h","time_range_clinic_sum_72h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","in_range_protocol_percent_48h","in_range_clinic_percent_72h","nut_tfe_in_24h"," nut_npo_in_72h","nut_tfe_in_72h","diag_has_diabet")
+
+#maxit=200
+#alpha= 0.01
+#beta=-0.001
+#CV 3
+#8 features
+#mmce.test.mean=0.165
+c_selected_3=c("icu_dead_before_28","adt_hos_age"," score_sofa"," med_has_explicit_sepsis"," med_has_vaso","med_has_24h_vaso"," lactate_avg_48h"," lactate_avg_72h","time_hyper_gluce_sum_72h")
+
+#maxit=200
+#alpha=0.01
+#beta=-0.001
+#tune treshold=TRUE
+#treshhold args = auc
+#CV 3
+#91 features
+#mmce.test.mean=0.155
+c_selected_4=c("icu_dead_before_28","pat_gender","adt_hos_age","adt_readmit","icu_type_fservice","icu_has_presc_insulin","icu_has_admit_insulin","icu_stay_more72","icd9d_m_chapter","com_congest_hea_failure","com_cardiac_arrhythmias","com_valvula_disease","com_hypertension","com_paralysis","com_other_neur_disorders","com_chronic_pul_disease","com_diabetes_uncomplicated","com_diabetes_complicated","com_hypothyroidism","com_renal_failure","com_liver_disease","com_aids","com_lymphoma","com_metastatic_cancer","com_coagulopathy","com_obesity","com_fluid_elec_disorders","com_deficiency_anemias","com_alcohol_abuse","com_drug_abuse","com_psychoses","com_depression","score_sofa","med_has_infection","med_has_explicit_sepsis","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_24h_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","ph_avg_24h","po2_avg_24h","whiteblood_avg_24h","lactate_avg_24h","hemoglobin_avg_24h","pco2_avg_24h","bicarbonate_avg_24h","creatinine_avg_24h","ph_avg_48h","po2_avg_48h","whiteblood_avg_48h","lactate_avg_48h","pco2_avg_48h","bicarbonate_avg_48h","creatinine_avg_48h","ph_avg_72h","po2_avg_72h","whiteblood_avg_72h","lactate_avg_72h","pco2_avg_72h","bicarbonate_avg_72h","creatinine_avg_72h","time_hyper_gluce_sum_24h","time_range_protocol_sum_24h","time_range_clinic_sum_24h","time_hipo_moderate_sum_48h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","time_range_clinic_sum_48h","glucose_variability_48h","time_hipo_critical_sum_72h","time_hyper_gluce_sum_72h","time_range_protocol_sum_72h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","in_range_protocol_percent_24h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","glucose_variability_72h","nut_tpn_in_24h","nut_npo_in_24h","nut_tfe_in_24h","nut_npo_in_48h","nut_tfe_in_48h","nut_npo_in_72h","nut_tfe_in_72h","diag_has_diabet" )
+
+#maxit=300
+#alpha=0.01
+#beta=-0.001
+#tune=true
+#tune list meausure auc
+#cv 5
+#91 features
+#mmce.test.mean=0.155
+c_selected_5=c("icu_dead_before_28","adt_hos_age","icu_type_fservice","icu_has_presc_insulin","icu_has_admiv_insulin","icu_has_admit_insulin","icu_stay_more72","icd9d_m_chapter","com_congest_hea_failure","com_cardiac_arrhythmias","com_periphe_vas_disorders","com_hypertension","com_paralysis","com_other_neur_disorders","com_diabetes_uncomplicated","com_diabetes_complicated","com_hypothyroidism","com_renal_failure","com_liver_disease","com_lymphoma","com_metastatic_cancer","com_solid_tum_wo_metastasis","com_obesity","com_fluid_elec_disorders","com_deficiency_anemias","com_alcohol_abuse","com_drug_abuse","com_psychoses","com_depression","score_sofa","med_has_infection","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_sepsis","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_24h_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","ph_avg_24h","po2_avg_24h","lactate_avg_24h","hemoglobin_avg_24h","pco2_avg_24h","bicarbonate_avg_24h","creatinine_avg_24h","ph_avg_48h","whiteblood_avg_48h","lactate_avg_48h","pco2_avg_48h","bicarbonate_avg_48h","creatinine_avg_48h","ph_avg_72h","po2_avg_72h","lactate_avg_72h","pco2_avg_72h","bicarbonate_avg_72h","creatinine_avg_72h","time_hipo_critical_sum_24h","time_hipo_moderate_sum_24h","time_hyper_gluce_sum_24h","time_range_protocol_sum_24h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","glucose_variability_48h","time_hipo_critical_sum_72h","time_hyper_gluce_sum_72h","time_range_protocol_sum_72h","time_range_clinic_sum_72h","hipo_moderate_percent_24h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","in_range_protocol_percent_24h","hipo_moderate_percent_48h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","in_range_protocol_percent_48h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","glucose_variability_72h","nut_tpn_in_24h","nut_npo_in_24h","nut_tfe_in_24h","nut_tpn_in_48h","nut_npo_in_48h","nut_tfe_in_48h","nut_npo_in_72h","nut_tfe_in_72h")
+
+c_sel=c("c_selected_2","c_selected_3","c_selected_4","c_selected_5")
+
+```
+
+
+
+
+```{r}
+
+lmdl_s<-list()
+
+for (fsel in c_sel)
+{
+
+  c_selected=eval(parse(text=fsel))
+  
+  d_train_sel<-d_train[,which(colnames(d_train) %in% c_selected)]
+  d_test_sel<-d_test[,which(colnames(d_train) %in% c_selected)]
+
+
+
+  time_train<-system.time(glm_iter <- h2o.glm(y = y,
+                                              training_frame = as.h2o(d_train_sel),
+                                              validation_frame = as.h2o(d_test_sel),
+                                              family = "binomial",
+                                              link="logit",
+                                              balance_classes = TRUE,
+                                              lambda = 0,
+                                              standardize=TRUE,
+                                              remove_collinear_columns=TRUE,
+                                              compute_p_values=TRUE,
+                                              nfolds = 10,
+                                              keep_cross_validation_predictions = TRUE,
+                                              keep_cross_validation_fold_assignment = TRUE,
+                                              seed = 1)
+                                              )
+  lmdl_s<-append(lmdl_s,glm_iter)
+
+}
+
+```
+
+
+
+```{r}
+
+for (i in 1:4)
+{
+
+  #AUC
+  print(i+1)
+  
+  print(tauc<-paste(format(lmdl_s[[i]]@model$training_metrics@metrics$AUC,digits=3),"Train"))
+  print(vauc<-paste(format(lmdl_s[[i]]@model$validation_metrics@metrics$AUC,digits=3),"Validation"))
+  print(cvauc<-paste(format(lmdl_s[[i]]@model$cross_validation_metrics@metrics$AUC,digits=3),"Cross Val"))
+  
+  print("---------------------")
+}
+```
+
+#coeficients
+```{r}
+h2o.coef(lmdl_s)
+```
+
+#normalized coeficients
+```{r}
+h2o.coef_norm(lmdl_s)
+```
+
+#coeficients table
+```{r}
+View(lmdl_s@model$coefficients_table)
+```
+
+
+#variable importance
+```{r}
+h2o.std_coef_plot(lmdl_s)
+```
+
+
+#ROC curve
+#TODO buscar una mejor o ver como formatearla con ggplot
+```{r}
+fpr = lmdl_s@model$training_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr = lmdl_s@model$training_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_val = lmdl_s@model$validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_val = lmdl_s@model$validation_metrics@metrics$thresholds_and_metric_scores$tpr
+fpr_cv = lmdl_s@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$fpr
+tpr_cv = lmdl_s@model$cross_validation_metrics@metrics$thresholds_and_metric_scores$tpr
+plot(fpr,tpr, type='l')
+title('AUC')
+lines(fpr_val,tpr_val,type='l',col='green')
+lines(fpr_cv,tpr_cv,type='l',col='red')
+legend("bottomright",c(tauc,vauc,cvauc),col=c("black","green","red"),lty=c(1,1),lwd=c(3,3))
+
+```
+
+
+  
+```{r}
+h2o.auc(lmdl_s,valid=FALSE) # on train
+h2o.auc(lmdl_s,valid=TRUE) # on test
+```
+#confusion matrix
+```{r}
+lmdl_s@model$training_metrics@metrics$max_criteria_and_metric_scores
+
+```
+

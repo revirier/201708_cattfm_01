@@ -1,7 +1,6 @@
 ```{r}
 
 require(caret)
-require(pROC)
 require(mlr)
 require(doMC)
 require(FSelector)

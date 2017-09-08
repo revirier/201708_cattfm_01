@@ -1,0 +1,4 @@
+maxit 100
+alpha 0.01
+beta -0.001
+Holdout

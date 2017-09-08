@@ -1,4 +1,4 @@
-
+#calc the AUC metrics from the models saved
 
 ```{r}
 

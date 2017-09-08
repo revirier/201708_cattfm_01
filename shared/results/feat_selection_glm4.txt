@@ -1,0 +1,6 @@
+maxit=200
+alpha=0.01
+beta=-0.001
+tune treshold=TRUE
+treshhold args = auc
+CV 3

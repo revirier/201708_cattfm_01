@@ -1,0 +1,4 @@
+maxit=200
+alpha= 0.01
+beta=-0.001
+CV 3

@@ -13,13 +13,18 @@ set.seed(1000)
 
 #start h2o
 
-h2o.init(nthreads=-1, max_mem_size = "16G")
+h2o.init(nthreads=-1, max_mem_size = "7G")
 #h2o.removeAll()
 #h2o.shutdown(prompt = FALSE)
 
 # LOAD DATASET
-load("~/shared/datasets/ds_icu_pm_complete__no_fact_2")
-#load("~/shared/datasets/ds_icu_pm_complete_2")
+#load("~/shared/datasets/ds_icu_pm_complete__no_fact_2")
+load("~/shared/datasets/ds_icu_pm_complete_2")
+
+#without std
+#stdl<-names(ds_icu_pm_2[grep("_std_",names(ds_icu_pm_2))])
+#ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% stdl)]
+
 #load("~/shared/datasets/ds_icu_pm_only_glucose_2")
 
 
@@ -31,7 +36,7 @@ y<-"icu_dead_before_28"
 
 #dataset total
 ```{r}
-train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.60,list = FALSE)
+train<-createDataPartition(y=ds_icu_pm_2$icu_dead_before_28,p=.80,list = FALSE)
 d_train<-ds_icu_pm_2[train,]
 d_test<-ds_icu_pm_2[-train,]
   
@@ -39,7 +44,7 @@ d_test<-ds_icu_pm_2[-train,]
 aml <- h2o.automl( y = y,
                   training_frame = as.h2o(d_train),
                   leaderboard_frame = as.h2o(d_test),
-                  max_runtime_secs = 28800)
+                  max_runtime_secs = 20000)
 
 ```
 

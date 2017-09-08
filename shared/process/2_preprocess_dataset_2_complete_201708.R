@@ -1,12 +1,13 @@
 ---
 # preprocess dataframe before analytics
 # not normalize, to normalize with the h2o model
+# with STD vars
   
 # 20170807
 # load from dataset 2
   
 # completa dataset
-
+# ds_icu_pm_2 20445 obs 148 vars
 ---
   
 #libraries
@@ -19,8 +20,6 @@ require("dplyr")
 
 load(file="~/shared/datasets/ds_icu_raw_2")
 
-
-# 20445 of 168 variables
 
 #first we converted the logical values to 1=TRUE / 0=FALSE
 
@@ -90,10 +89,6 @@ ds_icu_pm_2$whiteblood_avg_48h[ds_icu_pm_2$whiteblood_avg_48h>200]<-NA
 ds_icu_pm_2$whiteblood_avg_48h[ds_icu_pm_2$whiteblood_avg_48h>200]<-NA
 
 
-#STD
-stdl<-names(ds_icu_pm_2[grep("_std_",names(ds_icu_pm_2))])
-
-
 #GLUCOSE_VARIABILITY_ICU
 ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_icu>500]<-NA
 ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_24h>300]<-NA
@@ -104,10 +99,6 @@ ds_icu_pm_2$glucose_variability_icu[ds_icu_pm_2$glucose_variability_72h>300]<-NA
 #NUT_TPN
 tpnl<-names(ds_icu_pm_2[grep("nut_tpn",names(ds_icu_pm_2))])
 ds_icu_pm_2[tpnl][is.na(ds_icu_pm_2[tpnl])]<-0
-
-
-#NUT_PPN
-ppnl<-names(ds_icu_pm_2[grep("nut_ppn",names(ds_icu_pm_2))])
 
 
 #NUT_TFE

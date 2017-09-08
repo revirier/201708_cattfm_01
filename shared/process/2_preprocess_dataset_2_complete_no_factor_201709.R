@@ -3,6 +3,8 @@
 # not normalize, to normalize with the h2o model
 # sofa + age without beeing factorized
   
+#ds_icu_pm_2 20445 obs ans 121 vars
+  
 # 20170901
 # load from dataset 2
   
@@ -182,6 +184,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-save(file="~/shared/datasets/ds_icu_pm_complete__no_fact_2",ds_icu_pm_2)
+#save(file="~/shared/datasets/ds_icu_pm_complete__no_fact_2",ds_icu_pm_2)
 
 summary(ds_icu_pm_2)

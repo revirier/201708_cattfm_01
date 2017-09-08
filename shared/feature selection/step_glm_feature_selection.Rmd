@@ -1,3 +1,5 @@
+#feature selection with step R command
+
 ```{r}
 require(caret)
 require(pROC)

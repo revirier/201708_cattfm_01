@@ -1,5 +1,5 @@
 ---
-title: "R Notebook statistics"
+title: "Statistics population calcs"
 output: html_notebook
 ---
 

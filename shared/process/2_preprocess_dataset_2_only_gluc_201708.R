@@ -1,9 +1,12 @@
 ---
 # preprocess dataframe before analytics
 # not normalize, to normalize with the h2o model
+# only data related with glucose
   
 # 20170807
 # load from dataset 2
+  
+# ds_icu_pm_2 20445obs 34 vars
   
 # only vars related to glucose dataset
 
@@ -62,6 +65,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-save(file="~/shared/datasets/ds_icu_pm_only_glucose_2",ds_icu_pm_2)
+#save(file="~/shared/datasets/ds_icu_pm_only_glucose_2",ds_icu_pm_2)
 
 
