@@ -1,5 +1,4 @@
 
-
 ```{r}
 
 require(h2o)
@@ -39,13 +38,14 @@ d_test<-ds_icu_pm_2[-train,]
 ```  
 
 
+
 #load feature selction results
 ```{r}
-load(file = "~/shared/results/feat_selection_glm_5")
+#load(file = "~/shared/results/feat_selection_glm_GA2")
 ```
 
 ```{r}
-sfeats
+sfeats$x
 ```
 
 ```{r}
@@ -87,7 +87,67 @@ c_selected_4=c("icu_dead_before_28","pat_gender","adt_hos_age","adt_readmit","ic
 #mmce.test.mean=0.155
 c_selected_5=c("icu_dead_before_28","adt_hos_age","icu_type_fservice","icu_has_presc_insulin","icu_has_admiv_insulin","icu_has_admit_insulin","icu_stay_more72","icd9d_m_chapter","com_congest_hea_failure","com_cardiac_arrhythmias","com_periphe_vas_disorders","com_hypertension","com_paralysis","com_other_neur_disorders","com_diabetes_uncomplicated","com_diabetes_complicated","com_hypothyroidism","com_renal_failure","com_liver_disease","com_lymphoma","com_metastatic_cancer","com_solid_tum_wo_metastasis","com_obesity","com_fluid_elec_disorders","com_deficiency_anemias","com_alcohol_abuse","com_drug_abuse","com_psychoses","com_depression","score_sofa","med_has_infection","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_sepsis","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_24h_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","ph_avg_24h","po2_avg_24h","lactate_avg_24h","hemoglobin_avg_24h","pco2_avg_24h","bicarbonate_avg_24h","creatinine_avg_24h","ph_avg_48h","whiteblood_avg_48h","lactate_avg_48h","pco2_avg_48h","bicarbonate_avg_48h","creatinine_avg_48h","ph_avg_72h","po2_avg_72h","lactate_avg_72h","pco2_avg_72h","bicarbonate_avg_72h","creatinine_avg_72h","time_hipo_critical_sum_24h","time_hipo_moderate_sum_24h","time_hyper_gluce_sum_24h","time_range_protocol_sum_24h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","glucose_variability_48h","time_hipo_critical_sum_72h","time_hyper_gluce_sum_72h","time_range_protocol_sum_72h","time_range_clinic_sum_72h","hipo_moderate_percent_24h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","in_range_protocol_percent_24h","hipo_moderate_percent_48h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","in_range_protocol_percent_48h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","glucose_variability_72h","nut_tpn_in_24h","nut_npo_in_24h","nut_tfe_in_24h","nut_tpn_in_48h","nut_npo_in_48h","nut_tfe_in_48h","nut_npo_in_72h","nut_tfe_in_72h")
 
-c_sel=c("c_selected_2","c_selected_3","c_selected_4","c_selected_5")
+
+#maxit = 500, 
+#max.features = NA_integer_,
+#alpha = 0.001, 
+#beta=-0.0005
+#36 features
+#mmce.test.mean=0.158
+c_selected_6=c("icu_dead_before_28","adt_hos_age","icu_type_fservice","icu_has_presc_insulin","icu_has_admit_insulin","icd9d_m_chapter","com_cardiac_arrhythmias","com_hypertension","com_other_neur_disorders","com_diabetes_uncomplicated","com_metastatic_cancer","com_fluid_elec_disorders","com_deficiency_anemias","score_sofa","med_has_explicit_sepsis","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_mechvent","ph_avg_24h","po2_avg_24h","pco2_avg_24h","ph_avg_48h","po2_avg_48h","whiteblood_avg_48h","lactate_avg_48h","ph_avg_72h","lactate_avg_72h","bicarbonate_avg_72h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","time_range_protocol_sum_72h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","in_range_protocol_percent_72h","nut_npo_in_48h","nut_tfe_in_72h")
+
+
+#maxit = 500, 
+#max.features = NA_integer_,
+#alpha = 0.001, 
+#beta=-0.0005
+#tune.threshold=TRUE,
+#3CV
+#18 features
+#Threshold: 0.51
+#mmce.test.mean=0.16
+c_selected_7=c("icu_dead_before_28","adt_hos_age"," icu_type_fservice","icu_has_presc_insulin"," icd9d_m_chapter"," com_hypertension","com_liver_disease"," com_metastatic_cancer"," com_fluid_elec_disorders","score_sofa"," med_has_explicit_sepsis"," med_has_vaso","med_has_24h_vaso"," med_has_dialysis"," lactate_avg_48h"," lactate_avg_72h","time_range_protocol_sum_72h"," in_range_clinic_percent_24h","in_range_protocol_percent_72h")
+
+
+#ctrl = makeFeatSelControlGA(same.resampling.instance = TRUE,
+#                                    impute.val = NULL, 
+#                                    maxit = 500, 
+#                                    max.features = NA_integer_,
+#				    comma=FALSE,
+#				    mu=10L,
+#				    lambda=10L,
+#				    crossover.rate=0.5,
+#				    mutation.rate=0.05,
+#				    tune.threshold=TRUE,
+#			            tune.threshold.args = list(measure=list(auc)))
+#GA
+#mmce.test.mean=0.154
+#72 features
+#3CV
+#lambda + mu
+c_selected_GA=c("icu_dead_before_28","adt_hos_age","adt_readmit","icu_type_fservice","icu_has_presc_insulin","icu_has_admit_insulin","icu_stay_more72","icd9d_m_chapter","com_congest_hea_failure","com_cardiac_arrhythmias","com_valvula_disease","com_pulmona_cir_disorders","com_hypertension","com_other_neur_disorders","com_diabetes_uncomplicated","com_diabetes_complicated","com_renal_failure","com_liver_disease","com_lymphoma","com_metastatic_cancer","com_coagulopathy","com_fluid_elec_disorders","com_deficiency_anemias","com_depression","score_sofa","med_has_allergie_insulin","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","ph_avg_24h","po2_avg_24h","lactate_avg_24h","pco2_avg_24h","creatinine_avg_24h","ph_avg_48h","lactate_avg_48h","bicarbonate_avg_48h","creatinine_avg_48h","ph_avg_72h","whiteblood_avg_72h","lactate_avg_72h","bicarbonate_avg_72h","time_hipo_critical_sum_24h","time_hyper_gluce_sum_24h","time_range_clinic_sum_24h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h",
+ "glucose_variability_48h","time_hyper_gluce_sum_72h","time_range_clinic_sum_72h","hipo_moderate_percent_24h","hyper_gluce_percent_24h","in_range_protocol_percent_24h","hipo_critical_percent_48h","hipo_critical_percent_72h","hipo_moderate_percent_72h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","nut_tpn_in_24h","nut_npo_in_24h","nut_tpn_in_48h","nut_npo_in_48h","nut_tpn_in_72h","nut_npo_in_72h","nut_tfe_in_72h","diag_has_diabet","score_sofa_more4")
+
+               
+#mmce.test.mean=0.153
+#69 features
+##3CV
+#ctrl = makeFeatSelControlGA(same.resampling.instance = TRUE,
+#                                    impute.val = NULL, 
+#                                    maxit = 500, 
+#                                    max.features = NA_integer_,
+#				    comma=FALSE,
+#				    mu=5L,
+#				    lambda=50L,
+#				    crossover.rate=0.5,
+#				    mutation.rate=0.05,
+#				    tune.threshold=TRUE,
+#			      tune.threshold.args = list(measure=list(auc)))
+c_selected_GA2=c("icu_dead_before_28","pat_gender","adt_hos_age","icu_type_fservice","icu_has_presc_insulin","icu_has_admit_insulin","icu_stay_more72","com_cardiac_arrhythmias","com_valvula_disease","com_hypertension","com_other_neur_disorders","com_hypothyroidism","com_liver_disease","com_peptic_ulc_disease","com_lymphoma","com_metastatic_cancer","com_rheumatoid_art_diseases","com_obesity","com_fluid_elec_disorders","com_deficiency_anemias","com_drug_abuse","com_depression","score_sofa","med_has_allergie_insulin","med_has_infection","med_has_explicit_sepsis","med_has_organ_dysfunction","med_has_vaso","med_has_24h_vaso","med_has_dialysis","med_has_24h_dialysis","med_has_mechvent","med_has_24h_mechvent","med_has_esteroid_presc","bicarbonate_avg_24h","creatinine_avg_24h","ph_avg_48h","whiteblood_avg_48h","lactate_avg_48h","hemoglobin_avg_48h","bicarbonate_avg_48h","ph_avg_72h","lactate_avg_72h","hemoglobin_avg_72h","bicarbonate_avg_72h","time_range_protocol_sum_24h","time_range_clinic_sum_24h","glucose_variability_24h","time_hipo_critical_sum_48h","time_hyper_gluce_sum_48h","time_range_protocol_sum_48h","glucose_variability_48h","time_hyper_gluce_sum_72h","time_range_clinic_sum_72h","hipo_moderate_percent_24h","hyper_gluce_percent_24h","in_range_clinic_percent_24h","hyper_gluce_percent_48h","in_range_clinic_percent_48h","in_range_protocol_percent_48h","hipo_critical_percent_72h","hyper_gluce_percent_72h","in_range_clinic_percent_72h","in_range_protocol_percent_72h","nut_tpn_in_24h","nut_npo_in_24h","nut_npo_in_48h","nut_npo_in_72h","diag_has_diabet","score_sofa_more4")
+
+
+c_sel=c("c_selected_2","c_selected_3","c_selected_4","c_selected_5","c_selected_6","c_selected_7","c_selected_GA","c_selected_GA2")
+
 
 ```
 
@@ -133,7 +193,8 @@ for (fsel in c_sel)
 
 ```{r}
 
-for (i in 1:4)
+
+for (i in 1:length(lmdl_s))
 {
 
   #AUC
@@ -146,6 +207,12 @@ for (i in 1:4)
   print("---------------------")
 }
 ```
+#TODO HACER UNA GRÁFICA
+```{r}
+
+```
+
+
 
 #coeficients
 ```{r}

@@ -1,12 +1,16 @@
-require(h2o)
+#require(h2o)
 require(caret)
 require(mlr)
+require(doMC)
 
 set.seed(1000)
 
 #start cluster H2O
 
-h2o.init(nthreads=-1, max_mem_size = "7G")
+#h2o.init(nthreads=-1, max_mem_size = "7G")
+
+#parallel
+registerDoMC(cores=6)
 
 
 # LOAD DATASET
@@ -39,12 +43,14 @@ ctrl = makeFeatSelControlSequential(same.resampling.instance = TRUE,
                                     maxit = 500, 
                                     max.features = NA_integer_,
                                     alpha = 0.001, 
-                                    beta=-0.0005)
+                                    beta=-0.0005,
+				    tune.threshold=TRUE,
+			            tune.threshold.args = list(measure=list(auc)))
 
 #glm learner
 #default values
 
-lrn<-makeLearner("classif.h2o.glm",predict.type = "prob")
+lrn<-makeLearner("classif.binomial",predict.type = "prob")
 
 
 # 3 cv resampling
@@ -56,4 +62,4 @@ sfeats = selectFeatures(learner = lrn, task = cltask_1, resampling = rdesc, cont
                         show.info = TRUE)
 
 
-save(sfeats,file = "~/shared/results/feat_selection_glm_6")
+save(sfeats,file = "~/shared/results/feat_selection_glm_7")

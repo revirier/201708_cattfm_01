@@ -1,0 +1,9 @@
+ctrl = makeFeatSelControlSequential(same.resampling.instance = TRUE,
+                                    impute.val = NULL, 
+                                    method='sfbs', 
+                                    maxit = 500, 
+                                    max.features = NA_integer_,
+                                    alpha = 0.001, 
+                                    beta=-0.0005
+				    tune.threshold=TRUE,
+			            tune.threshold.args = list(measure=list(auc)))

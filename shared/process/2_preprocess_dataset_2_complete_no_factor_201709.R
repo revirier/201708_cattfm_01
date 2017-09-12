@@ -7,7 +7,11 @@
   
 # 20170901
 # load from dataset 2
+
   
+# 20170913
+# delete time_ by redundancy
+
 # complete dataset
 
 ---
@@ -77,7 +81,6 @@ ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("diag_s_has_diabet","
 
 
 #SCORES
-
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_apsiii"))]
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_lods"))]
 ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% c("score_mlods"))]
@@ -122,6 +125,12 @@ tfel<-names(ds_icu_pm_2[grep("nut_tfe",names(ds_icu_pm_2))])
 
 #IMPUTATION
 ds_icu_pm_2[tfel][is.na(ds_icu_pm_2[tfel])]<-0
+
+#TIME REDUNDANT
+tml<-names(ds_icu_pm_2[grep("time_",names(ds_icu_pm_2))])
+
+#remove time
+ds_icu_pm_2<-ds_icu_pm_2[,-which(names(ds_icu_pm_2) %in% tml)]
 
 #remove outliers
 ds_icu_pm_2$hyper_gluce_percent_72h[ds_icu_pm_2$hyper_gluce_percent_72h<0]<-NA
@@ -184,6 +193,6 @@ for (i in 1:length(bincols)) {
   }
 }
 
-#save(file="~/shared/datasets/ds_icu_pm_complete__no_fact_2",ds_icu_pm_2)
+#save(file="~/shared/datasets/ds_icu_pm_complete_no_fact_3",ds_icu_pm_2)
 
 summary(ds_icu_pm_2)
