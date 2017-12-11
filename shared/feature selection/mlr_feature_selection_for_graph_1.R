@@ -37,13 +37,13 @@ cltask_1 = makeClassifTask(id = "c2", data = ds_icu_pm_2, target = "icu_dead_bef
 # masure auc
 # ctrl
 
-lfeat=c(20,30,40,50,60,70,80,90,100)
+lfeat=c(20,30,40)
 
 for (f in lfeat)
   {
   ctrl <- makeFeatSelControlSequential(same.resampling.instance = TRUE,
                                     impute.val = NULL, 
-                                    method='sffs', 
+                                    method='sfbs', 
                                     maxit = 400, 
                                     max.features = f,
                                     alpha=0.01,
